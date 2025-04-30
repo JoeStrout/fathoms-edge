@@ -7,17 +7,31 @@ import "importUtil"
 ensureImport "listUtil"
 
 // Thing: base class for anything that can appear in the world (or
-// inside a container).
+// inside a container).  These will be drawn as sprites, if image is
+// not null, or else in the main tile display, iconIdx is not null.
 globals.Thing = {}
 Thing.x = -1		// Coordinates always stored as MAP coordinates;
 Thing.y = -1		// in a container, this may be position in container.
 Thing.iconIdx = 180
+Thing.image = null
 Thing.color = "#AAAAAA"
 Thing.container = null	// Container, if any (if null, item is on map)
 Thing.capacity = 0		// total size of items this can contain
 Thing.contents = null	// list of contents
 Thing.name = "thing"
 Thing.destroyed = false
+Thing._sprite = null	// cache; use .sprite method!
+
+Thing.sprite = function
+	if not self.image then return null
+	if self._sprite == null then
+		self._sprite = new Sprite
+		self._sprite.scale = 2
+	end if
+	self._sprite.image = self.image
+	self._sprite.tint = self.color
+	return self._sprite
+end function
 
 Thing.placeOnMap = function(x, y)
 	self.removeFromContainer
@@ -68,6 +82,32 @@ Agent.iconIdx = 248
 Agent.color = "#FFFFFF"
 Agent.update = null
 
+Agent.attemptMove = function(dx, dy)
+	if self.container then return false	// can't move while in container
+	level.moveThing self, self.x + dx, self.y + dy
+	self.x += dx
+	self.y += dy
+end function	
+
+// Handle a command -- typically this is called on the Player, and the
+// command comes from some keyboard input.  But NPC code can use this too,
+// if that's an easier way to control your character.  Return 1 if this
+// command takes time (i.e. should give all other agents a turn); 0 if there
+// was no valid command, or it took no time.
+Agent.handleCommand = function(cmd)
+	dx = 0; dy = 0
+	if cmd == "WAIT" then return 1
+	if cmd == "NORTH" then dy = 1
+	if cmd == "SOUTH" then dy = -1
+	if cmd == "EAST" then dx = 1
+	if cmd == "WEST" then dx = -1
+	if dx or dy then
+		self.attemptMove dx, dy
+		return 1
+	end if
+	return 0
+end function
+
 // CombatAgent: an agent with all the support code for combat.  This is
 // where most of the complexity of the game lives.  CombatAgent may be 
 // used directly for simple mobs, or you may use NPC for mobs that act
@@ -96,7 +136,10 @@ globals.Character = new CombatAgent
 
 // Class representing the player.
 globals.Player = new Character
-Player.iconIdx = 25
+Player.iconIdx = null
+Player.image = oneBit.getTileImage(25)
+
+	
 
 // Characters other than the player (but able to do most of the things the
 // player could do).
