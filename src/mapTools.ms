@@ -1,17 +1,11 @@
 // Utility functions and classes for creating and managing
 // the game map.
 
-// Note that there is always just one, 2-dimensional map loaded at
-// a time.  If the game world has multiple levels, those will be
-// managed separately, with just one at a time in play.
 
 import "importUtil"
 ensureImport "oneBit"
 ensureImport "disp"
 ensureImport "listUtil"
-
-width = 32
-height = 19
 
 fillTiles = function(tileDisp, indexOptions, color="#FFFFFF", fillPercent=100)
 	for x in range(0, tileDisp.extent[0]-1)

@@ -8,9 +8,9 @@ ensureImport "listUtil"
 
 // Thing: base class for anything that can appear in the world (or
 // inside a container).
-Thing = {}
-Thing.x = 0		// Coordinates always stored as MAP coordinates;
-Thing.y = 0		// in a container, this may be position in container.
+globals.Thing = {}
+Thing.x = -1		// Coordinates always stored as MAP coordinates;
+Thing.y = -1		// in a container, this may be position in container.
 Thing.iconIdx = 180
 Thing.color = "#AAAAAA"
 Thing.container = null	// Container, if any (if null, item is on map)
@@ -19,18 +19,26 @@ Thing.contents = null	// list of contents
 Thing.name = "thing"
 Thing.destroyed = false
 
+Thing.placeOnMap = function(x, y)
+	self.removeFromContainer
+	self.removeFromMap
+	self.x = x
+	self.y = y
+	level.addThing self, x, y
+end function
+
+Thing.removeFromMap = function
+	level.removeThing self
+	self.x = -1
+	self.y = -1
+end function
+
 // Thing.removeFromContainer: remove this item from its container, if any.
 Thing.removeFromContainer = function
 	if self.container and self.container.contents then
 		self.container.contents.removeVal self
 	end if
 	self.container = null
-end function
-
-// Thing.destroy: call this when you want to get rid of an item.
-Thing.destroy = function
-	self.removeFromContainer
-	self.destroyed = true
 end function
 
 // Thing.contain: add another item to this container.
@@ -41,15 +49,21 @@ Thing.contain = function(contentItem)
 	self.contents.push contentItem
 end function
 
+// Thing.destroy: call this when you want to get rid of an item.
+Thing.destroy = function
+	self.removeFromContainer
+	self.destroyed = true
+end function
+
 // Item: inanimate objects that agents can (usually) pick up.
-Item = new Thing
+globals.Item = new Thing
 Item.size = 1		// 1 size (mass/volume) unit ~= 1 apple
 Item.value = 1		// base value to buy/sell
 
 // Agent: things with agency, i.e., they get updates and can take actions.
 // This includes things like magic fountains that change their state over
 // time, etc.
-Agent = new Thing
+globals.Agent = new Thing
 Agent.iconIdx = 248
 Agent.color = "#FFFFFF"
 Agent.update = null
@@ -58,7 +72,7 @@ Agent.update = null
 // where most of the complexity of the game lives.  CombatAgent may be 
 // used directly for simple mobs, or you may use NPC for mobs that act
 // more like the player (able to speak, use weapons, etc.)
-CombatAgent = new Agent
+globals.CombatAgent = new Agent
 CombatAgent.health = 100
 
 CombatAgent.corpseName = function; return self.name + " corpse"; end function
@@ -78,12 +92,12 @@ end function
 
 // Character: common code for the player and NPCs.  Characters have more
 // complex behavior than generic CombatAgents.
-Character = new CombatAgent
+globals.Character = new CombatAgent
 
 // Class representing the player.
-Player = new Character
+globals.Player = new Character
 Player.iconIdx = 25
 
 // Characters other than the player (but able to do most of the things the
 // player could do).
-NPC = new Character
+globals.NPC = new Character
