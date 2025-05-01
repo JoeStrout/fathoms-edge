@@ -5,6 +5,7 @@
 
 import "importUtil"
 ensureImport "listUtil"
+ensureImport "stringUtil"
 
 // Thing: base class for anything that can appear in the world (or
 // inside a container).  These will be drawn as sprites, if image is
@@ -69,6 +70,29 @@ Thing.destroy = function
 	self.destroyed = true
 end function
 
+// Thing.nameWithArticle: return the name of this item, prefixed
+// with an article -- typically "a" or "an", but could be "some"
+// or whatever is appropriate for the kind of thing it is.  Note
+// that if aOrThe is "the", then we want a definite (rather than
+// indefinite) article.
+Thing.nameWithArticle = function(aOrThe="a")
+	// Default behavior:
+	if aOrThe == "the" then return "the " + self.name
+	if "aeiou".contains(self.name[0]) then return "an " + self.name
+	return "a " + self.name
+end function
+
+Thing.drawIcon = function(gfx, x, y)
+	if self.image then
+		img = self.image
+	else if self.iconIdx then
+		img = oneBit.getTileImage(self.iconIdx)
+	else
+		return
+	end if
+	gfx.drawImage img, x, y, -1, -1, 0, 0, -1, -1, self.color
+end function
+
 // Item: inanimate objects that agents can (usually) pick up.
 globals.Item = new Thing
 Item.size = 1		// 1 size (mass/volume) unit ~= 1 apple
@@ -82,12 +106,37 @@ Agent.iconIdx = 248
 Agent.color = "#FFFFFF"
 Agent.update = null
 
+// Agent.note: this is called with short messages describing things
+// this agent does, or that happen to this agent.  If it's the Player,
+// these are probably printed or logged somewhere.  If it's any other
+// agent, these probably go nowhere (but you can always hook in some
+// logging method if you really want to).
+Agent.note = function(msg)
+end function
+
+// Agent.attemptMove: try to move in the given direction, doing whatever
+// we do by default (picking up loose items, etc.).  Return true on 
+// success, false if we weren't able to move.
 Agent.attemptMove = function(dx, dy)
 	if self.container then return false	// can't move while in container
+	stuff = level.getItems(self.x + dx, self.y + dy)
+	for item in stuff
+		self.pickUp item
+	end for
 	level.moveThing self, self.x + dx, self.y + dy
 	self.x += dx
 	self.y += dy
-end function	
+	return true
+end function
+
+// Agent.pickUp: pick up an item currently in the level, and place it
+// into our inventory.
+Agent.pickUp = function(item)
+	item.removeFromMap
+	self.contain item
+	itemName = item.nameWithArticle
+	self.note "Picked up {itemName}.".fill(locals)
+end function
 
 // Handle a command -- typically this is called on the Player, and the
 // command comes from some keyboard input.  But NPC code can use this too,
@@ -96,7 +145,10 @@ end function
 // was no valid command, or it took no time.
 Agent.handleCommand = function(cmd)
 	dx = 0; dy = 0
-	if cmd == "WAIT" then return 1
+	if cmd == "WAIT" then
+		self.note "Time passes."
+		return 1
+	end if
 	if cmd == "NORTH" then dy = 1
 	if cmd == "SOUTH" then dy = -1
 	if cmd == "EAST" then dx = 1
@@ -139,7 +191,17 @@ globals.Player = new Character
 Player.iconIdx = null
 Player.image = oneBit.getTileImage(25)
 
-	
+Player.note = function(msg)
+	ui.addLogMessage msg
+end function
+
+Player.handleCommand = function(cmd)
+	if cmd == "INVENTORY" then
+		ui.showInventory self
+		return 0
+	end if
+	return super.handleCommand(cmd)
+end function
 
 // Characters other than the player (but able to do most of the things the
 // player could do).

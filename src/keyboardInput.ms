@@ -22,6 +22,9 @@ keys.z = "WAIT"
 keys[char(10)] = "INTERACT"
 keys[" "] = "INTERACT"
 
+keys.i = "INVENTORY"
+
+
 getNextCommand = function
 	while key.available
 		k = key.get

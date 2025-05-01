@@ -15,6 +15,12 @@ load = function
 	bone.color = "#CCCCCC"
 	bone.placeOnMap 8, 3
 	
+	apple = new Item
+	apple.name = "apple"
+	apple.iconIdx = 943
+	apple.color = "#FF4444"
+	apple.placeOnMap 30, 15
+	
 	player.placeOnMap 15, 10
 end function
 

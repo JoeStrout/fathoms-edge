@@ -4,6 +4,7 @@ import "importUtil"
 ensureImport "stringUtil"
 ensureImport "bmfFonts"
 ensureImport "styledText"
+ensureImport "textUtil"
 
 smallPrinter = new styledText.BmfPrinter
 smallPrinter.font = bmfFonts.Font.load("/sys/fonts/NotoSans-14.bmf")
@@ -50,7 +51,39 @@ showAlert = function(message)
 	gfx.drawRect x-5, y-5, img.width+10, img.height+10, "#FFFFFF", 5		
 end function
 
+addLogMessage = function(msg)
+	// Hacky implementation for now:
+	text.row = 0
+	text.color = color.gray
+	print "[" + turn + "] ", ""
+	text.color = color.silver
+	print msg, ""
+	textUtil.clearToEOL
+	text.column = 0
+end function
 
+showInventory = function(container, title="Inventory")
+	rowHeight = 18
+	items = container.contents
+	if items == null then items = []
+	h = rowHeight * (items.len + 3)
+	w = 300
+	left = 480 - w/2
+	bottom = 320 - h/2
+	gfx.fillRect left, bottom, w, h, "#000000"
+	gfx.drawRect left+3, bottom+3, w-6, h-6, "#FFFFFF", 5
+	y = bottom + h - 20
+	smallPrinter.boldFont.printCentered title, left+w/2, y, 1, textColor
+	y -= rowHeight*1.5
+	for item in items
+		item.drawIcon gfx, left + 12, y - 2
+		smallPrinter.boldFont.print "- " + item.nameWithArticle, 
+		  left + 30, y, 1, textColor
+		y -= rowHeight
+	end for
+	key.get
+	gfx.fillRect left, bottom, w, h, color.clear
+end function
 
 demo = function
 	clear

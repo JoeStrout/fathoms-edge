@@ -44,8 +44,22 @@ end function
 removeThing = function(thing)
 	if 0 <= thing.x < width and 0 <= thing.y < height and things[thing.x][thing.y] then
 		things[thing.x][thing.y].removeVal thing
-		// ToDo: update display
+		if thing.image then
+			disp.sprite.sprites.removeVal thing.sprite
+		else if disp.main.cell(thing.x, thing.y) == thing.iconIdx then
+			disp.main.setCell thing.x, thing.y, null
+		end if
 	end if
+end function
+
+getItems = function(x, y)
+	result = []
+	if things[x][y] != null then
+		for thing in things[x][y]
+			if thing isa Item then result.push thing
+		end for
+	end if
+	return result
 end function
 
 moveThing = function(thing, newX, newY)
