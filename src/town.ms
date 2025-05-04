@@ -21,6 +21,18 @@ load = function
 	apple.color = "#FF4444"
 	apple.placeOnMap 30, 15
 	
+	Shroom = new Item
+	Shroom.name = "shroom"
+	Shroom.image = file.loadImage("/usr/pics/shroom.png")
+	Shroom.Colors = [color.red, color.green, color.brown, color.yellow,
+	  "#CCCCFF", "#CCCCCC", "#CCCCAA"]
+	
+	for i in range(5)
+		shroom = new Shroom
+		shroom.color = Shroom.Colors.any
+		shroom.placeOnMap floor(40*rnd), floor(30*rnd)
+	end for
+	
 	player.placeOnMap 15, 10
 end function
 

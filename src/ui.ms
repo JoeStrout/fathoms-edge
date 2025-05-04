@@ -32,6 +32,34 @@ _printToImage = function(styleRuns, bgColor="#000000", width=300, printer=null)
 	return tempG.getImage(0, printer.y, tempG.width, tempG.height - printer.y)
 end function
 
+drawRightPanel = function
+	// Draw the panel on the right that shows game/player info.
+	w = 248
+	h = 640
+	left = 960 - w
+	midx = left + w/2
+	bottom = 0
+	gfx.fillRect left, bottom, w, h, "#222222"
+	gfx.drawRect left, bottom, w, h, "#CCCCCC"
+	gfx.color = "#CCCCCC"
+	font = smallPrinter.font
+	dy = 24
+	x = left + 8
+	rx = left + w - 8
+	y = bottom + h - 20
+	c = gfx.color
+	font.print "Turn: " + turn, x, y, 1, c
+	font.printRight "Loc: " + player.x + ", " + player.y, rx, y, 1, c
+	y -= dy
+	font.print "Health: " + player.health, x, y, 1, c
+	y -= dy
+	for st in player.statuses.all
+		font.print st, x, y, 1, c
+		y -= dy
+	end for
+		
+end function
+
 showAlert = function(message)
 	runs = styledText.parseMarkup(message)
 	gfx.color  = textColor
@@ -83,6 +111,10 @@ showInventory = function(container, title="Inventory")
 	end for
 	key.get
 	gfx.fillRect left, bottom, w, h, color.clear
+end function
+
+update = function
+	drawRightPanel
 end function
 
 demo = function

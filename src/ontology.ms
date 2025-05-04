@@ -6,6 +6,7 @@
 import "importUtil"
 ensureImport "listUtil"
 ensureImport "stringUtil"
+ensureImport "status"
 
 // Thing: base class for anything that can appear in the world (or
 // inside a container).  These will be drawn as sprites, if image is
@@ -22,6 +23,15 @@ Thing.contents = null	// list of contents
 Thing.name = "thing"
 Thing.destroyed = false
 Thing._sprite = null	// cache; use .sprite method!
+
+Thing.Make = function(capacity=0)
+	noob = new self
+	if capacity > 0 then
+		noob.capacity = capacity
+		noob.contents = []
+	end if
+	return noob
+end function
 
 Thing.sprite = function
 	if not self.image then return null
@@ -166,6 +176,13 @@ end function
 // more like the player (able to speak, use weapons, etc.)
 globals.CombatAgent = new Agent
 CombatAgent.health = 100
+CombatAgent.statuses = null	// StatusHolder object
+
+CombatAgent.Make = function(capacity=100)
+	noob = super.Make(capacity)
+	noob.statuses = StatusHolder.Make
+	return noob
+end function
 
 CombatAgent.corpseName = function; return self.name + " corpse"; end function
 
