@@ -10,6 +10,16 @@ load = function
 	level.clearToSize 40, 30
 	mapTools.fillTiles disp.background, [1,5,5,5], "#006600", 50
 	
+	Tree = Obstacle.Make("tree")
+	Tree.iconIdx = 211
+	Tree.color = color.brown
+	for i in range(20)
+		tree = new Tree
+		tree.placeOnMap floor(40*rnd), floor(30*rnd)
+		disp.overlay.setCell tree.x, tree.y+1, 179 // tree top
+		disp.overlay.setCellTint tree.x, tree.y+1, "#88FF88"
+	end for
+	
 	bone = Item.Make("bone")
 	bone.iconIdx = 784
 	bone.color = "#CCCCCC"
@@ -60,6 +70,24 @@ load = function
 		shroom = new Shroom
 		shroom.color = Shroom.Colors.any
 		shroom.placeOnMap floor(40*rnd), floor(30*rnd)
+	end for
+	
+	Rat = Mob.Make("rat")
+	Rat.iconIdx = 287
+	Rat.color = color.brown
+	Rat.disposition = Mob.FLEEING
+	for i in range(2)
+		rat = new Rat
+		rat.placeOnMap floor(40*rnd), floor(30*rnd)
+	end for	
+	
+	Slime = Mob.Make("slime")
+	Slime.iconIdx = 283
+	Slime.color = color.lime
+	Slime.disposition = Mob.HOSTILE
+	for i in range(2)
+		slime = new Slime
+		slime.placeOnMap floor(40*rnd), floor(30*rnd)
 	end for
 	
 	player.placeOnMap 15, 10

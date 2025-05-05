@@ -14,7 +14,8 @@ height = 25
 
 cellSize = disp.main.cellSize - disp.main.overlap
 
-things = null	// 2D array containing list of items for each x,y cell
+things = null	// 2D array containing list of things for each x,y cell
+agents = []		// flat list of agents on the level
 
 clearToSize = function(width, height)
 	for d in [disp.background, disp.main, disp.overlay]
@@ -39,6 +40,7 @@ addThing = function(thing, x, y)
 			disp.main.setCellTint x, y, thing.color
 		end if
 	end if
+	if thing isa Agent and not agents.contains(thing) then agents.push thing
 end function
 
 removeThing = function(thing)
@@ -50,6 +52,7 @@ removeThing = function(thing)
 			disp.main.setCell thing.x, thing.y, null
 		end if
 	end if
+	if thing isa Agent then agents.removeVal thing
 end function
 
 getItems = function(x, y)
@@ -81,4 +84,14 @@ moveThing = function(thing, newX, newY)
 		disp.main.setCell newX, newY, thing.iconIdx
 		disp.main.setCellTint newX, newY, thing.color
 	end if
+end function
+
+// Return whether the given x,y position can be passed by the given agent.
+passable = function(x, y, byAgent)
+	if x < 0 or x >= width or y < 0 or y >= height then return false
+	if things[x][y] == null then return true
+	for thing in things[x][y]
+		if thing.blocksMovement then return false
+	end for
+	return true
 end function

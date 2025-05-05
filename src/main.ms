@@ -21,7 +21,9 @@ runMainLoop = function
 		cmd = keyboardInput.getNextCommand
 		if cmd and player.handleCommand(cmd) then
 			globals.turn += 1
-			player.update
+			for agent in level.agents
+				agent.update
+			end for
 			ui.update
 		end if
 	end while

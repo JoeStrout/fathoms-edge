@@ -21,6 +21,7 @@ Thing.container = null	// Container, if any (if null, item is on map)
 Thing.capacity = 0		// total size of items this can contain
 Thing.contents = null	// list of contents
 Thing.name = "thing"
+Thing.blocksMovement = false
 Thing.destroyed = false
 Thing._sprite = null	// cache; use .sprite method!
 
@@ -104,6 +105,14 @@ Thing.drawIcon = function(gfx, x, y)
 	gfx.drawImage img, x, y, -1, -1, 0, 0, -1, -1, self.color
 end function
 
+
+// Obstacle: things that go on the map, generally don't move around,
+// and block movement by the player and mobs.
+globals.Obstacle = new Thing
+Obstacle.iconIdx = 210
+Obstacle.blocksMovement = true
+
+
 // Item: inanimate objects that agents can (usually) pick up.
 globals.Item = new Thing
 Item.size = 1
@@ -128,6 +137,7 @@ globals.Agent = new Thing
 Agent.iconIdx = 248
 Agent.color = "#FFFFFF"
 Agent.update = null
+Agent.blocksMovement = true
 
 // Agent.note: this is called with short messages describing things
 // this agent does, or that happen to this agent.  If it's the Player,
@@ -142,6 +152,11 @@ end function
 // success, false if we weren't able to move.
 Agent.attemptMove = function(dx, dy)
 	if self.container then return false	// can't move while in container
+	if not level.passable(self.x + dx, self.y + dy) then
+		// Bonk!
+		self.note "You can't move that way."
+		return false
+	end if
 	stuff = level.getItems(self.x + dx, self.y + dy)
 	for item in stuff
 		self.pickUp item
@@ -214,7 +229,53 @@ CombatAgent.makeCorpse = function
 	end if
 	return corpse
 end function
+
+// Mob: a CombatAgent that is, basically, a monster.  These may or may not
+// attack the player on sight, but it's always a possibility.
+globals.Mob = new CombatAgent
+Mob.HOSTILE = "HOSTILE"   // Mob is chasing/attacking player/allies
+Mob.NEUTRAL = "NEUTRAL"   // Mob is ignoring the player
+Mob.FLEEING = "FLEEING"   // Mob is fleeing (use sparingly — can be annoying!0
+Mob.FRIENDLY = "FRIENDLY" // Mob is friendly to the player
+Mob.disposition = Mob.NEUTRAL
+Mob.sightRadius = 10
+
+Mob.availableSteps = function
+	// Return a list of [dx, dy, distToPlayer] steps we can take from here,
+	// sorted in order of most-towards the player first.
+	result = []
+	for dx in [-1, 0, 1]
+		for dy in [-1, 0, 1]
+			if not dx and not dy then continue
+			x = self.x + dx
+			y = self.y + dy
+			if level.passable(x, y, self) then
+				d = mathUtil.distance([x,y], player)
+				result.push [dx, dy, d]
+			end if
+		end for
+	end for
+	result.sort 2  // sort by element 2, the distance to the player
+	return result
+end function
+
+Mob.update = function
+	super.update
+	playerDist = mathUtil.distance(player, self)
+	if playerDist > self.sightRadius or self.disposition == Mob.NEUTRAL then
+		// player's too far away... do normal behavior
+		// (which may be nothing)
+		return
+	end if
+	avail = self.availableSteps
+	if not avail then return
+	if self.disposition == Mob.HOSTILE then
+		self.attemptMove avail[0][0], avail[0][1]
+	else if self.disposition == Mob.FLEEING then
+		self.attemptMove avail[-1][0], avail[-1][1]	
+	end if
 	
+end function
 
 // Character: common code for the player and NPCs.  Characters have more
 // complex behavior than generic CombatAgents.
