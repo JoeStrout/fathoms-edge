@@ -197,6 +197,10 @@ CombatAgent.Make = function(name=null, capacity=100)
 	return noob
 end function
 
+CombatAgent.update = function
+	self.statuses.update
+end function
+
 CombatAgent.corpseName = function; return self.name + " corpse"; end function
 
 CombatAgent.makeCorpse = function

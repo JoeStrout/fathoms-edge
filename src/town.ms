@@ -4,6 +4,7 @@ import "importUtil"
 ensureImport "disp"
 ensureImport "mapTools"
 ensureImport "level"
+ensureImport "status"
 
 load = function
 	level.clearToSize 40, 30
@@ -27,6 +28,33 @@ load = function
 	  "#CCCCFF", "#CCCCCC", "#CCCCAA"]
 	Shroom.size = 1
 	Shroom.value = 1
+	Shroom.healthValue = 2
+	Shroom.useBy = function(agent)
+		super.useBy agent
+		// Add some crazy random effect!
+		fx = [
+		  status.POISONED,
+		  status.WEAKENED,
+		  status.VULNERABLE,
+		  status.INVULNERABLE,
+		  status.STUNNED,
+		  status.SLOWED,
+		  status.HASTENED,
+		  status.CONFUSED,
+		  status.BLIND,
+		  status.DEAF,
+		  status.HALLUCINATING,
+		  status.BLESSED,
+		  status.CURSED,
+		  status.CHARMED,
+		  status.ENCUMBERED,
+		  status.FATIGUED,
+		  status.GLOWING,
+		  status.MUTE,
+		  status.PANICKED,
+		  status.SERENE]
+		agent.statuses.apply fx.any, 5  // (lasts 5 turns)
+	end function
 	
 	for i in range(5)
 		shroom = new Shroom

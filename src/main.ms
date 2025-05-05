@@ -21,6 +21,7 @@ runMainLoop = function
 		cmd = keyboardInput.getNextCommand
 		if cmd and player.handleCommand(cmd) then
 			globals.turn += 1
+			player.update
 			ui.update
 		end if
 	end while
