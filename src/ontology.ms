@@ -24,8 +24,9 @@ Thing.name = "thing"
 Thing.destroyed = false
 Thing._sprite = null	// cache; use .sprite method!
 
-Thing.Make = function(capacity=0)
+Thing.Make = function(name=null, capacity=0)
 	noob = new self
+	if name != null then noob.name = name
 	if capacity > 0 then
 		noob.capacity = capacity
 		noob.contents = []
@@ -105,8 +106,20 @@ end function
 
 // Item: inanimate objects that agents can (usually) pick up.
 globals.Item = new Thing
-Item.size = 1		// 1 size (mass/volume) unit ~= 1 apple
+Item.size = 1
 Item.value = 1		// base value to buy/sell
+Item.usable = false
+Item.useBy = function(agent); end function
+Item.usedVerb = "used"
+
+// Food: items you can eat.
+globals.Food = new Item
+Food.usable = true
+Food.usedVerb = "ate"
+Food.healthGain = 5
+Food.useBy = function(agent)
+	if agent isa CombatAgent then agent.health += self.healthGain
+end function
 
 // Agent: things with agency, i.e., they get updates and can take actions.
 // This includes things like magic fountains that change their state over
@@ -178,8 +191,8 @@ globals.CombatAgent = new Agent
 CombatAgent.health = 100
 CombatAgent.statuses = null	// StatusHolder object
 
-CombatAgent.Make = function(capacity=100)
-	noob = super.Make(capacity)
+CombatAgent.Make = function(name=null, capacity=100)
+	noob = super.Make(name, capacity)
 	noob.statuses = StatusHolder.Make
 	return noob
 end function

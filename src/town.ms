@@ -9,23 +9,24 @@ load = function
 	level.clearToSize 40, 30
 	mapTools.fillTiles disp.background, [1,5,5,5], "#006600", 50
 	
-	bone = new Item
-	bone.name = "bone"
+	bone = Item.Make("bone")
 	bone.iconIdx = 784
 	bone.color = "#CCCCCC"
+	bone.size = 2
 	bone.placeOnMap 8, 3
 	
-	apple = new Item
-	apple.name = "apple"
+	apple = Food.Make("apple")
 	apple.iconIdx = 943
 	apple.color = "#FF4444"
-	apple.placeOnMap 30, 15
+	apple.value = 2
+	apple.placeOnMap 10, 15
 	
-	Shroom = new Item
-	Shroom.name = "shroom"
+	Shroom = Food.Make("shroom")
 	Shroom.image = file.loadImage("/usr/pics/shroom.png")
 	Shroom.Colors = [color.red, color.green, color.brown, color.yellow,
 	  "#CCCCFF", "#CCCCCC", "#CCCCAA"]
+	Shroom.size = 1
+	Shroom.value = 1
 	
 	for i in range(5)
 		shroom = new Shroom

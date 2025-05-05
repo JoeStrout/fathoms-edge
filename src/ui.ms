@@ -5,6 +5,10 @@ ensureImport "stringUtil"
 ensureImport "bmfFonts"
 ensureImport "styledText"
 ensureImport "textUtil"
+ensureImport "uiInventoryPanel"
+ensureImport "gui"
+
+Image9Slice = gui.Image9Slice
 
 smallPrinter = new styledText.BmfPrinter
 smallPrinter.font = bmfFonts.Font.load("/sys/fonts/NotoSans-14.bmf")
@@ -12,9 +16,13 @@ smallPrinter.italicFont = bmfFonts.Font.load("/sys/fonts/NotoSansItalic-14.bmf")
 smallPrinter.boldFont = bmfFonts.Font.load("/sys/fonts/NotoSansBold-14.bmf")
 smallPrinter.boldItalicFont = bmfFonts.Font.load("/sys/fonts/NotoSansBoldItalic-14.bmf")
 
+button9Slice = Image9Slice.make(file.loadImage("/usr/pics/button.png"))
+
 textColor = "#88FF88"
 
 tempG = new PixelDisplay
+
+log = []  // list of [turn number, message] pairs
 
 _printToImage = function(styleRuns, bgColor="#000000", width=300, printer=null)
 	if printer == null then printer = smallPrinter
@@ -31,6 +39,66 @@ _printToImage = function(styleRuns, bgColor="#000000", width=300, printer=null)
 	print "end y: " + printer.y
 	return tempG.getImage(0, printer.y, tempG.width, tempG.height - printer.y)
 end function
+
+Button = {}
+Button.normalColor = "#88CC88"
+Button.hoverColor = "#AAFFAA"
+Button.pressedColor = "#44AA44"
+Button.textColor = "#000000"
+Button.x = 480
+Button.y = 320
+Button.width = 64
+Button.height = 28
+Button.caption = "Button"
+Button.wasPressed = false
+Button.wasHovered = false
+Button.action = null
+
+Button.Make = function(caption="Button", x=480, y=320)
+	noob = new self
+	noob.caption = caption
+	noob.x = x
+	noob.y = y
+	return noob
+end function
+
+Button.contains = function(xy)
+	hw = self.width/2
+	hh = self.height/2
+	return self.x - hw <= xy.x <= self.x + hw and
+	  self.y - hh <= xy.y <= self.y + hh
+end function
+
+Button.draw = function(hovered=false, pressed=false)
+	if pressed then
+		c = self.pressedColor
+	else
+		if hovered then c = self.hoverColor else c = self.normalColor
+	end if
+	button9Slice.draw gfx, self.x - self.width/2, self.y - self.height/2,
+	  self.width, self.height, c
+	f = smallPrinter.boldFont
+	f.printCentered self.caption, self.x, self.y - f.lineHeight/2 + 2, 1, self.textColor
+	self.wasPressed = pressed
+	self.wasHovered = hovered
+end function
+
+Button.update = function
+	hovered = self.contains(mouse)
+	if hovered != self.wasHovered then self.draw hovered
+	if hovered and mouse.button then
+		// track until mouse-up!
+		self.draw true, true
+		while mouse.button
+			yield
+			stillOver = self.contains(mouse)
+			if stillOver != self.wasPressed then self.draw false, stillOver
+		end while
+		if self.wasPressed then self.action
+		self.draw self.contains(mouse)
+	end if
+end function
+
 
 drawRightPanel = function
 	// Draw the panel on the right that shows game/player info.
@@ -57,7 +125,14 @@ drawRightPanel = function
 		font.print st, x, y, 1, c
 		y -= dy
 	end for
-		
+	
+	y = 10
+	for i in range(log.len - 1, 0, -1)
+		entry = log[i]
+		if entry[0] >= turn-1 then c = "#CCFFCC" else c = "#888888"
+		font.print "[{0}] {1}".fill(entry), x, y, 1, c
+		y += dy
+	end for
 end function
 
 showAlert = function(message)
@@ -66,51 +141,45 @@ showAlert = function(message)
 	img = _printToImage(runs)
 	for scale in range(0.1, 0.9, 0.1)
 		w = img.width * scale
-		h = img.height * scale
+		h = (img.height + 40) * scale
 		x = 480 - w/2
 		y = 320 - h/2
 		gfx.drawImage img, x, y, w, h
 		yield
 	end for
-	x = 480 - img.width/2
-	y = 320 - img.height/2
-	gfx.fillRect x-8, y-8, img.width+16, img.height+16, "#000000"
-	gfx.drawImage img, x, y
-	gfx.drawRect x-5, y-5, img.width+10, img.height+10, "#FFFFFF", 5		
+	w = img.width
+	h = img.height + 40
+	x = 480 - w/2
+	y = 320 - h/2
+	gfx.fillRect x-8, y-8, w+16, h+16, "#000000"
+	gfx.drawImage img, x, y + 40
+	gfx.drawRect x-5, y-5, w+10, h+10, "#FFFFFF", 5		
+	btn = Button.Make("OK", 480, y + 16)
+	btn.draw
+	done = false
+	btn.action = function; outer.done = true; end function
+	doneKeys = " " + char(27) + char(13) + char(10)
+	while not done
+		yield
+		btn.update
+		if key.available and doneKeys.contains(key.get) then
+			btn.draw true, true
+			wait 0.1
+			btn.draw
+			wait 0.1
+			done = true
+		end if
+	end while
+	gfx.fillRect x-8, y-8, w+16, h+16, color.clear
 end function
 
 addLogMessage = function(msg)
-	// Hacky implementation for now:
-	text.row = 0
-	text.color = color.gray
-	print "[" + turn + "] ", ""
-	text.color = color.silver
-	print msg, ""
-	textUtil.clearToEOL
-	text.column = 0
+	log.push [turn, msg]
+	if log.len > 10 then log.pull
 end function
 
 showInventory = function(container, title="Inventory")
-	rowHeight = 18
-	items = container.contents
-	if items == null then items = []
-	h = rowHeight * (items.len + 3)
-	w = 300
-	left = 480 - w/2
-	bottom = 320 - h/2
-	gfx.fillRect left, bottom, w, h, "#000000"
-	gfx.drawRect left+3, bottom+3, w-6, h-6, "#FFFFFF", 5
-	y = bottom + h - 20
-	smallPrinter.boldFont.printCentered title, left+w/2, y, 1, textColor
-	y -= rowHeight*1.5
-	for item in items
-		item.drawIcon gfx, left + 12, y - 2
-		smallPrinter.boldFont.print "- " + item.nameWithArticle, 
-		  left + 30, y, 1, textColor
-		y -= rowHeight
-	end for
-	key.get
-	gfx.fillRect left, bottom, w, h, color.clear
+	uiInventoryPanel.show container, title
 end function
 
 update = function
