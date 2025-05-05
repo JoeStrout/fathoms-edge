@@ -43,12 +43,12 @@ draw = function(h, items, title, selItemIdx = -1)
 		item = items[i]
 		if i == selItemIdx then
 			gfx.fillRect left+6, y-4, width-12, 18, "#4444AA"
-			btn = Button.Make("Drop", left + 100, yButton)
+			btn = Button.Make("Drop", left + 100, yButton, ["d", "x"])
 			btn.item = item
 			btn.action = function; drop self.item; end function
 			buttons.push btn
 			if item.usable then
-				btn = Button.Make("Use", left + width - 100, yButton)
+				btn = Button.Make("Use", left + width - 100, yButton, ["u", char(10)])
 				btn.item = item
 				btn.action = function; use self.item; end function
 				buttons.push btn
@@ -84,13 +84,15 @@ show = function(container, title="Inventory")
 			outer.refresh = false
 		end if
 		if key.available then
-			k = key.get.code
-			if k == 19 then  // up
+			k = key.get
+			if k.code == 19 then  // up
 				selItemIdx = (selItemIdx + items.len - 1) % items.len
-			else if k == 20 then // down
+			else if k.code == 20 then // down
 				selItemIdx = (selItemIdx + 1) % items.len
-			else if k == 27 then // esc
+			else if k.code == 27 then // esc
 				break
+			else
+				for btn in btns; btn.handleKey(k); end for
 			end if
 			outer.refresh = true
 		end if

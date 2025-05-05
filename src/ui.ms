@@ -53,12 +53,15 @@ Button.caption = "Button"
 Button.wasPressed = false
 Button.wasHovered = false
 Button.action = null
+Button.shortcutKeys = null
 
-Button.Make = function(caption="Button", x=480, y=320)
+Button.Make = function(caption="Button", x=480, y=320, keys=null)
 	noob = new self
 	noob.caption = caption
 	noob.x = x
 	noob.y = y
+	if keys isa string then keys = [keys]
+	if keys then noob.shortcutKeys = keys
 	return noob
 end function
 
@@ -99,6 +102,20 @@ Button.update = function
 	end if
 end function
 
+Button.handleKey = function(keyPressed)
+	if not self.shortcutKeys then return false
+	for k in self.shortcutKeys
+		if k == keyPressed then
+			self.draw false, true
+			wait 0.1
+			self.draw
+			wait 0.1
+			self.action
+			return true
+		end if
+	end for
+	return false
+end function
 
 drawRightPanel = function
 	// Draw the panel on the right that shows game/player info.
@@ -154,21 +171,14 @@ showAlert = function(message)
 	gfx.fillRect x-8, y-8, w+16, h+16, "#000000"
 	gfx.drawImage img, x, y + 40
 	gfx.drawRect x-5, y-5, w+10, h+10, "#FFFFFF", 5		
-	btn = Button.Make("OK", 480, y + 16)
+	btn = Button.Make("OK", 480, y + 16, [" ", char(27), char(13), char(10)])
 	btn.draw
 	done = false
 	btn.action = function; outer.done = true; end function
-	doneKeys = " " + char(27) + char(13) + char(10)
 	while not done
 		yield
 		btn.update
-		if key.available and doneKeys.contains(key.get) then
-			btn.draw true, true
-			wait 0.1
-			btn.draw
-			wait 0.1
-			done = true
-		end if
+		if key.available then btn.handleKey(key.get)
 	end while
 	gfx.fillRect x-8, y-8, w+16, h+16, color.clear
 end function
