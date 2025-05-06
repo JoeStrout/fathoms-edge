@@ -25,6 +25,21 @@ Damage.str = function
 	return result
 end function
 
+Damage.any = function
+	for type in types
+		if self[type] then return true
+	end for
+	return false
+end function
+
+Damage.total = function
+	sum = 0
+	for type in types
+		sum += self[type]
+	end for
+	return sum
+end function
+
 
 // Resistance: *percentage* resistance, e.g., if fire = 25,
 // then this means 25% resistance to fire damage (actualy 
@@ -72,16 +87,19 @@ runTests = function
 
 	dam = new Damage
 	assertEqual dam.str, "No damage"
+	assertEqual dam.any, false
 	
 	dam.physical = 5
 	assertEqual dam.str, "5"
+	assertEqual dam.any, true
 
 	dam.cold = 3
 	assertEqual dam.str, "5 + 3 Cold"
 	
 	dam.poison = -1  // (not sure why you would do this, but...)
 	assertEqual dam.str, "5 + 3 Cold - 1 Poison"
-
+	assertEqual dam.sum, 7
+	
 	res = new Resistance
 	assertEqual res.str, ""
 	

@@ -45,6 +45,35 @@ end function
 
 
 applyAttackEffect = function(attacker, defender)
-	attacker.note "You attack " + defender.name + "."
-	defender.note attacker.name + " attacks you!"
+	atkName = attacker.nameWithArticle
+	defName = defender.nameWithArticle("the")
+	
+	// First, check for dodging
+	dodgeChance = defender.dodge * defender.statuses.dodgeModifier
+	roll = round(100 * rnd)
+	attacker.note "{roll} >= {dodgeChance}, so:".fill(locals)
+	if roll < dodgeChance then
+		attacker.note "{defName} dodges your attack!".fill(locals).capitalized
+		defender.note "You dodge {atkName}'s attack.".fill(locals)
+		return
+	end if
+
+	// Then, apply damage.
+	dam = defender.resistance.apply(attacker.damage)
+	if not dam.any then
+		attacker.nonte "You attack {defName}, but do no damage!".fill(locals)
+		defender.note "{atkName} attacks you, but does no damage.".
+		  fill(locals).capitalized
+	else
+		defender.takeDamage dam
+		if defender.dead then
+			attacker.note "You slay {defName}.".fill(locals)
+			defender.note "You have been slain by {atkName}!".fill(locals)
+		else
+			damStr = dam.str
+			attacker.note "You attack {defName} for {damStr}.".fill(locals)
+			defender.note "{atkName} attacks you for {damStr}!".
+			  fill(locals).capitalized
+		end if
+	end if
 end function

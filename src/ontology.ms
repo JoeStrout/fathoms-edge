@@ -7,6 +7,7 @@ import "importUtil"
 ensureImport "listUtil"
 ensureImport "stringUtil"
 ensureImport "status"
+ensureImport "damType"
 ensureImport "combat"
 
 // Thing: base class for anything that can appear in the world (or
@@ -30,9 +31,9 @@ Thing.Make = function(name=null, iconIdxOrImage=null, capacity=0)
 	noob = new self
 	if name != null then noob.name = name
 	if iconIdxOrImage isa number then
-		self.iconIdx = iconIdxOrImage
+		noob.iconIdx = iconIdxOrImage
 	else if iconIdxOrImage isa Image then
-		self.image = iconIdxOrImage
+		noob.image = iconIdxOrImage
 	end if
 	if capacity > 0 then
 		noob.capacity = capacity
@@ -210,13 +211,22 @@ end function
 // more like the player (able to speak, use weapons, etc.)
 globals.CombatAgent = new Agent
 CombatAgent.health = 100
-CombatAgent.statuses = null	// StatusHolder object
+CombatAgent.statuses = null	  // StatusHolder object
+CombatAgent.damage = null     // Damage object (for current attack)
+CombatAgent.resistance = null // Resistance object
+CombatAgent.dodge = 1         // % chance of dodging
+CombatAgent.leavesCorpse = false
 
 CombatAgent.Make = function(name=null, iconIdxOrImage=null, capacity=100)
 	noob = super.Make(name, iconIdxOrImage, capacity)
 	noob.statuses = StatusHolder.Make
+	noob.damage = new Damage
+	noob.damage.physical = 1   // just to have something by default
+	noob.resistance = new Resistance
 	return noob
 end function
+
+CombatAgent.dead = function; return self.health <= 0; end function
 
 CombatAgent.update = function
 	self.statuses.update
@@ -224,9 +234,34 @@ end function
 
 CombatAgent.corpseName = function; return self.name + " corpse"; end function
 
+CombatAgent.takeDamage = function(damage)
+	if damage isa Damage then
+		self.health -= damage.sum
+	else
+		self.health -= damage
+	end if
+	if self.health <= 0 then self.die
+end function
+
+CombatAgent.die = function
+	self.dead = true
+	level.removeThing self
+	if self.leavesCorpse then
+		level.addThing self.makeCorpse, self.x, self.y
+	else if self.contents then
+		loot = self.contents
+		self.contents = null
+		for item in loot
+			level.addThing item
+		end for
+	end if
+end function	
+
 CombatAgent.makeCorpse = function
 	corpse = new Item
 	corpse.name = self.corpseName
+	corpse.iconIdx = 786
+	corpse.color = color.gray
 	if self.contents then
 		corpse.contents = self.contents
 		for item in self.contents

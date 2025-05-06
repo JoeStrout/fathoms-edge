@@ -24,7 +24,7 @@ load = function
 	bone.size = 2
 	bone.placeOnMap 8, 3
 	
-	apple = Food.Make("apple", 943)
+	globals.apple = Food.Make("apple", 943)
 	apple.color = "#FF4444"
 	apple.value = 2
 	apple.placeOnMap 10, 15
@@ -71,6 +71,8 @@ load = function
 	Rat = Mob.Make("rat", 287)
 	Rat.color = color.brown
 	Rat.disposition = Mob.FLEEING
+	Rat.health = 5
+	Rat.leavesCorpse = true
 	for i in range(2)
 		rat = new Rat
 		rat.placeOnMap floor(40*rnd), floor(30*rnd)
@@ -79,6 +81,7 @@ load = function
 	Slime = Mob.Make("slime", 283)
 	Slime.color = color.lime
 	Slime.disposition = Mob.HOSTILE
+	Slime.health = 10
 	for i in range(2)
 		slime = new Slime
 		slime.placeOnMap floor(40*rnd), floor(30*rnd)

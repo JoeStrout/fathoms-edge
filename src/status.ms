@@ -51,6 +51,16 @@ StatusHolder.Make = function
 	return noob
 end function
 
+StatusHolder.dodgeModifier = function
+	if self.items.hasIndex(STUNNED) then return 0
+	if self.items.hasIndex(FROZEN) then return 0
+	modifier = 1
+	for st in [WEAKENED, SLOWED, BLIND, ENCUMBERED, FATIGUED, PANICKED]
+		if self.items.hasIndex(st) then modifier *= 0.5
+	end for
+	return modifier
+end function
+
 // Add a new status effect to this set of statuses.
 // Makes use of the global turn number.
 StatusHolder.apply = function(newStatus="BLESSED", duration=10)
@@ -156,6 +166,7 @@ runTests = function
 	sh.apply SLOWED, 5
 	sh.update; globals.turn += 1
 	assertEqual sh.hasStatus(SLOWED), true
+	assertEqual sh.dodgeModifier, 0.5
 	sh.apply HASTENED, 3
 	assertEqual sh.hasStatus(SLOWED), false
 	assertEqual sh.hasStatus(HASTENED), false
