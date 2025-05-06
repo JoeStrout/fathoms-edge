@@ -47,6 +47,10 @@ end function
 globals.Resistance = {}
 for type in types; Resistance[type] = 0; end for
 
+Resistance.resetToZero = function
+	for type in types; self[type] = 0; end for
+end function
+
 Resistance.str = function
 	result = []
 	for type in types

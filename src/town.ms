@@ -68,6 +68,14 @@ load = function
 		shroom.placeOnMap floor(40*rnd), floor(30*rnd)
 	end for
 	
+	Ring = Equipment.Make("Ring of Protection", 907, loadout.RING)
+	Ring.resistance.fire = 10
+	Ring.resistance.cold = 10
+	Ring.resistance.shock = 5
+	
+	ring = new Ring
+	ring.placeOnMap 7, 9
+	
 	Rat = Mob.Make("rat", 287)
 	Rat.color = color.brown
 	Rat.disposition = Mob.FLEEING
@@ -84,6 +92,7 @@ load = function
 	Slime.health = 10
 	for i in range(2)
 		slime = new Slime
+		if rnd < 0.5 then slime.contain new Ring
 		slime.placeOnMap floor(40*rnd), floor(30*rnd)
 	end for
 	

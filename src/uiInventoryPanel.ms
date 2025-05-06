@@ -6,6 +6,8 @@ import "importUtil"
 width = 300
 rowHeight = 18
 
+RETURN = char(10)
+
 init = function
 	outer.boldFont = ui.smallPrinter.boldFont
 	outer.thinFont = ui.smallPrinter.font
@@ -15,12 +17,13 @@ end function
 
 // Helper method: draw the inventory box, and return
 // the set of buttons that go with the selected item.
-draw = function(h, items, title, selItemIdx = -1)
+draw = function(h, items, loadout, title, selItemIdx = -1)
 	left = 480 - width/2
-	xIcon = left + 12
-	xName = left + 30
-	xSize = left + width - 50
-	xValue = left + width - 12
+	xUse = left + 24  // (center point)
+	xIcon = left + 38 // (left point)
+	xName = left + 56 // (left point)
+	xSize = left + width - 50  // (right point)
+	xValue = left + width - 12 // (right point)
 
 	bottom = 320 - h/2
 	gfx.fillRect left, bottom, width, h, "#000000"
@@ -39,6 +42,7 @@ draw = function(h, items, title, selItemIdx = -1)
 	yButton = bottom + 24
 	drop = @outer.drop
 	use = @outer.use
+	unequip = @outer.unequip
 	for i in items.indexes
 		item = items[i]
 		if i == selItemIdx then
@@ -47,13 +51,19 @@ draw = function(h, items, title, selItemIdx = -1)
 			btn.item = item
 			btn.action = function; drop self.item; end function
 			buttons.push btn
-			if item.usable then
-				btn = Button.Make("Use", left + width - 100, yButton, ["u", char(10)])
+			if loadout.slotOfItem(item) then
+				btn = Button.Make("Remove", left + width - 100, yButton, ["u","r",RETURN])
+				btn.item = item
+				btn.action = function; unequip self.item; end function
+				buttons.push btn
+			else if item.usable then
+				btn = Button.Make("Use", left + width - 100, yButton, ["u", RETURN])
 				btn.item = item
 				btn.action = function; use self.item; end function
 				buttons.push btn
 			end if
 		end if
+		loadout.drawSlotIconForItem item, xUse, y
 		item.drawIcon gfx, xIcon, y - 2
 		boldFont.print item.name, xName, y, 1, textColor
 		boldFont.printRight item.size, xSize, y, 1, textColor
@@ -79,7 +89,7 @@ show = function(container, title="Inventory")
 	outer.refresh = true
 	while true
 		if refresh then
-			btns = draw(h, items, title, selItemIdx)
+			btns = draw(h, items, agent.loadout, title, selItemIdx)
 			for btn in btns; btn.draw; end for
 			outer.refresh = false
 		end if
@@ -103,6 +113,7 @@ show = function(container, title="Inventory")
 end function
 
 drop = function(item)
+	agent.loadout.unequip item
 	item.placeOnMap agent.x, agent.y
 	outer.refresh = true
 	itemName = item.nameWithArticle
@@ -112,11 +123,20 @@ end function
 
 use = function(item)
 	item.useBy agent
-	item.destroy
 	outer.refresh = true
 	used = item.usedVerb.capitalized
 	itemName = item.nameWithArticle
 	agent.note "{used} {itemName}.".fill(locals)
+	agent.update
+	ui.update
+end function
+
+unequip = function(item)
+	agent.loadout.unequip item
+	outer.refresh = true
+	itemName = item.nameWithArticle
+	agent.note "Removed {itemName}.".fill(locals)
+	agent.update
 	ui.update
 end function
 

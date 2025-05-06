@@ -30,15 +30,30 @@ end for
 
 
 // To keep track of what's equipped where, we have this structure:
-Loadout = {}
+globals.Loadout = {}
 for slot in slotsExceptTwoHand
 	Loadout[slot] = null
 end for
 
+Loadout.items = function
+	result = []
+	for slot in slotsExceptTwoHand
+		item = self[slot]
+		if item isa list then
+			for subitem in item
+				if result.indexOf(subitem) == null then result.push subitem
+			end for
+		else if item and result.indexOf(item) == null then
+			result.push item
+		end if
+	end for
+	return result
+end function
+
 // Attempt to equip the given item.  Return true if successful,
 // false if failed.
 Loadout.equip = function(item)
-	slot = item.slot
+	if item isa Equipment then slot = item.slot else slot = MAINHAND
 	if not slot then return false
 	if slot == RING then
 		// Rings are special; we allow only 2 of these, and
@@ -78,14 +93,15 @@ end function
 // false if failed.   It might fail if the item is cursed, for example
 // (or if it's not equipped anyway).
 Loadout.unequip = function(item)
-	// ToDo: if item.cursed then return false
+	if item.hasIndex("cursed") and item.cursed then return false
 	found = false
 	for slot in slotsExceptTwoHand
 		if self[slot] == item then
 			self[slot] = null
 			found = true
 		else if self[slot] isa list and self[slot].contains(item) then
-			self.slot.removeVal item
+			self[slot].removeVal item
+			if self[slot].len == 0 then self[slot] = null
 			found = true
 		end if
 	end for
@@ -112,6 +128,8 @@ Loadout.slotOfItem = function(item)
 	for slot in slotsExceptTwoHand
 		if self[slot] == item then return slot
 	end for
+	if self[RING] isa list and self[RING].contains(item) then return RING
+	return null
 end function
 
 // Return the item or items in the given slot.  (May return a list
@@ -129,7 +147,16 @@ Loadout.itemInSlot = function(slot)
 end function
 
 Loadout.drawSlotIconForItem = function(item, x, y)
+	slot = self.slotOfItem(item)
+	if slot then Loadout.DrawSlotIcon slot, x, y
+end function
 
+Loadout.DrawSlotIcon = function(slot, x, y)
+	if slot == TWOHAND then
+		// ToDo
+	else
+		gfx.drawImage slotIcon[slot], x - slotIcon[slot].width/2, y
+	end if
 end function
 
 
@@ -195,7 +222,33 @@ runTests = function
 	assertEqual eq.itemInSlot(TWOHAND), [broadsword, broadsword]
 	assertEqual eq.slotOfItem(broadsword), TWOHAND
 	assertEqual eq.slotOfItem(offDagger), null
-		
+	
+	assertEqual eq.equip(ring1), true
+	assertEqual eq.slotOfItem(ring1), RING
+	assertEqual eq.itemInSlot(RING), ring1
+
+	assertEqual eq.equip(ring2), true
+	assertEqual eq.slotOfItem(ring1), RING
+	assertEqual eq.slotOfItem(ring2), RING
+	assertEqual eq.itemInSlot(RING), [ring1, ring2]
+
+	assertEqual eq.equip(ring3), true
+	assertEqual eq.slotOfItem(ring1), null
+	assertEqual eq.slotOfItem(ring2), RING
+	assertEqual eq.slotOfItem(ring3), RING
+	assertEqual eq.itemInSlot(RING), [ring2, ring3]
+	
+	assertEqual eq.unequip(ring2), true
+	assertEqual eq.slotOfItem(ring2), null
+	assertEqual eq.slotOfItem(ring3), RING
+	assertEqual eq.itemInSlot(RING), ring3
+	assertEqual eq.items, [broadsword, ring3]
+
+	assertEqual eq.unequip(ring3), true
+	assertEqual eq.slotOfItem(ring3), null
+	assertEqual eq.itemInSlot(RING), null
+	
+	assertEqual eq.items, [broadsword]
 
 	print "equipment tests complete.  Failures: " + errorCount
 end function

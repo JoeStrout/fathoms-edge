@@ -136,18 +136,28 @@ Food.usedVerb = "ate"
 Food.healthGain = 5
 Food.useBy = function(agent)
 	if agent isa CombatAgent then agent.health += self.healthGain
+	self.destroy
 end function
 
 
 // Equipment: items you can equip (i.e. put in an equipment slot).
 globals.Equipment = new Item
 Equipment.usable = true
+Equipment.usedVerb = "equipped"
 Equipment.slot = loadout.MAINHAND
+Equipment.cursed = false
 
 Equipment.Make = function(name=null, iconIdxOrImage=null, slot=null)
 	noob = super.Make(name, iconIdxOrImage)
 	if slot then noob.slot = slot
+	noob.resistance = new Resistance
+	noob.damage = new Damage
 	return noob
+end function
+
+Equipment.useBy = function(agent)
+	if not agent isa CombatAgent then return
+	agent.loadout.equip self
 end function
 
 // Agent: things with agency, i.e., they get updates and can take actions.
@@ -227,6 +237,7 @@ CombatAgent.health = 100
 CombatAgent.statuses = null	  // StatusHolder object
 CombatAgent.damage = null     // Damage object (for current attack)
 CombatAgent.resistance = null // Resistance object
+CombatAgent.loadout = null    // Loadout object
 CombatAgent.dodge = 1         // % chance of dodging
 CombatAgent.leavesCorpse = false
 
@@ -236,12 +247,22 @@ CombatAgent.Make = function(name=null, iconIdxOrImage=null, capacity=100)
 	noob.damage = new Damage
 	noob.damage.physical = 1   // just to have something by default
 	noob.resistance = new Resistance
+	noob.loadout = new Loadout
+	qa.assert noob.image, "CombatAgents must always have a sprite image"
 	return noob
 end function
 
 CombatAgent.dead = function; return self.health <= 0; end function
 
 CombatAgent.update = function
+	// update resistance
+	r = new Resistance
+	for item in self.loadout.items
+		r = r.add(item.resistance)
+	end for
+	self.resistance = r
+
+	// update status effects
 	self.statuses.update
 end function
 
@@ -295,11 +316,11 @@ Mob.disposition = Mob.NEUTRAL
 Mob.sightRadius = 10
 
 Mob.Make = function(name=null, iconIdxOrImage=null, capacity=100)
-	noob = super.Make(name, iconIdxOrImage, capacity)
-	// To support combat animations, mobs always need a sprite.
-	if noob.image == null and noob.iconIdx > 0 then
-		noob.image = oneBit.getTileImage(noob.iconIdx)
+	if iconIdxOrImage isa number and iconIdxOrImage > 0 then
+		// To support combat animations, mobs always need a sprite.
+		iconIdxOrImage = oneBit.getTileImage(iconIdxOrImage)
 	end if
+	noob = super.Make(name, iconIdxOrImage, capacity)
 	return noob
 end function
 
@@ -354,7 +375,7 @@ Player.name = "Player"
 Player.iconIdx = null
 
 Player.Make = function
-	noob = super.Make("Player", 25)
+	return super.Make("Player", oneBit.getTileImage(25))
 end function
 
 Player.note = function(msg)

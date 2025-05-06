@@ -20,6 +20,14 @@ button9Slice = Image9Slice.make(file.loadImage("/usr/pics/button.png"))
 
 textColor = "#88FF88"
 
+damColor = {
+	"physical": "#AAAAAA", 
+	"fire": "#AAFF00",
+	"cold": "#8888FF", 
+	"shock": "#FFFF00",
+	"poison": "#44FF44",
+	"necrotic": "#000000" }
+
 tempG = new PixelDisplay
 
 log = []  // list of [turn number, message] pairs
@@ -47,7 +55,7 @@ Button.pressedColor = "#44AA44"
 Button.textColor = "#000000"
 Button.x = 480
 Button.y = 320
-Button.width = 64
+Button.width = 80
 Button.height = 28
 Button.caption = "Button"
 Button.wasPressed = false
@@ -128,7 +136,7 @@ drawRightPanel = function
 	gfx.drawRect left, bottom, w, h, "#CCCCCC"
 	gfx.color = "#CCCCCC"
 	font = smallPrinter.font
-	dy = 24
+	dy = 20
 	x = left + 8
 	rx = left + w - 8
 	y = bottom + h - 20
@@ -142,6 +150,25 @@ drawRightPanel = function
 		font.print st, x, y, 1, c
 		y -= dy
 	end for
+
+	y -= dy/2
+	font.print "Resistances:", x, y, 1, gfx.color
+	y -= dy
+	column = 0
+	gotAny = false
+	for type in damType.types
+		r = player.resistance[type]
+		if r then
+			c = damColor[type]
+			font.print type.capitalized + ": " + r + "%", x + 12 + 114*column, y, 1, c
+			column = not column
+			if column == 0 then y -= dy
+			gotAny = true
+		end if
+	end for
+	if not gotAny then font.print "None", x + 12, y, 1, gfx.color
+	y -= dy
+
 	
 	y = 10
 	for i in range(log.len - 1, 0, -1)
@@ -150,6 +177,8 @@ drawRightPanel = function
 		font.print "[{0}] {1}".fill(entry), x, y, 1, c
 		y += dy
 	end for
+	
+	
 end function
 
 showAlert = function(message)

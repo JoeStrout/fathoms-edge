@@ -14,6 +14,7 @@ doMeleeAttack = function(attacker, defender)
 	
 	// Ensure proper Z-ordering of sprites based on Y position
 	sprite = attacker.sprite
+	qa.assert sprite != null
 	defSprite = defender.sprite
 	if defSprite then
 		atkIdx = disp.sprite.sprites.indexOf(sprite)
