@@ -49,10 +49,7 @@ applyAttackEffect = function(attacker, defender)
 	defName = defender.nameWithArticle("the")
 	
 	// First, check for dodging
-	dodgeChance = defender.dodge * defender.statuses.dodgeModifier
-	roll = round(100 * rnd)
-	attacker.note "{roll} >= {dodgeChance}, so:".fill(locals)
-	if roll < dodgeChance then
+	if chance(defender.dodge * defender.statuses.dodgeModifier) then
 		attacker.note "{defName} dodges your attack!".fill(locals).capitalized
 		defender.note "You dodge {atkName}'s attack.".fill(locals)
 		return

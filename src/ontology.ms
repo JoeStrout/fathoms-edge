@@ -8,6 +8,7 @@ ensureImport "listUtil"
 ensureImport "stringUtil"
 ensureImport "status"
 ensureImport "damType"
+ensureImport "loadout"
 ensureImport "combat"
 
 // Thing: base class for anything that can appear in the world (or
@@ -135,6 +136,18 @@ Food.usedVerb = "ate"
 Food.healthGain = 5
 Food.useBy = function(agent)
 	if agent isa CombatAgent then agent.health += self.healthGain
+end function
+
+
+// Equipment: items you can equip (i.e. put in an equipment slot).
+globals.Equipment = new Item
+Equipment.usable = true
+Equipment.slot = loadout.MAINHAND
+
+Equipment.Make = function(name=null, iconIdxOrImage=null, slot=null)
+	noob = super.Make(name, iconIdxOrImage)
+	if slot then noob.slot = slot
+	return noob
 end function
 
 // Agent: things with agency, i.e., they get updates and can take actions.
@@ -339,7 +352,10 @@ globals.Character = new CombatAgent
 globals.Player = new Character
 Player.name = "Player"
 Player.iconIdx = null
-Player.image = oneBit.getTileImage(25)
+
+Player.Make = function
+	noob = super.Make("Player", 25)
+end function
 
 Player.note = function(msg)
 	ui.addLogMessage msg

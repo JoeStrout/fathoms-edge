@@ -32,3 +32,14 @@ The target gets a chance to Dodge the attack -- this is a skill, and provides so
 
 *Real estate:* In the home town, there should be a handful of houses you could buy, ranging from small shacks to multi-room homes.  You can drop stuff there (or place stuff in containers) and it will be safe, whereas stuff dropped in public places will get gradually cleaned up.  Perhaps you could also equip your home with potion-making gear?  Not sure how far we want to go down that rabbit hole.  But still, it's a nice reward for the player as they level up and gain gold.
 
+*Crafting:* If we do want to go down the crafting rabbit-hole, a good way to do it would be to have basically crafting tables you can Use (either by Using them from your inventory, or if they're furniture, by pushing into them).  Using one of these would bring up your inventory list, with the ability to toggle a checkmark on each item, and some "Result:" section would show you when the selected ingredients match some recipe that type of crafting station supports.  OR, maybe you pick a recipe first, and it auto-draws the items from your inventory, or points out what you're missing.  Crafting station ideas:
+	- alchemy table: brew potions
+	- smelter: turn ore into ingots
+	- forge: make weapons/tools
+	- oven: bake bread, cookies, pies, and cakes
+	
+
+*Furniture:* Items too big to automatically pick up, like tables, chests, and crafting stations.  To move these, you would have to Use another item: _Hand Truck_.  The procedure would be: Use a Hand Truck while standing next to some furniture; it then picks up that item, keeping it next to you as you move around.  When you press a movement direction, if that's _toward_ the item (i.e. it's already in that direction), you move forward; otherwise, it just moves the item over to that side of you.  If that space is not empty, you just go bonk. You stop using it when you back directly away (or attempt to, even if that direction is blocked).  So to turn around with a hand truck, you have to have room to use the in-between direction.  All this would be mainly for arranging furniture in your house, though you could probably also use it in some dungeons to cheese a puzzle here and there.
+
+
+
