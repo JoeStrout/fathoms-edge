@@ -7,6 +7,7 @@ import "importUtil"
 ensureImport "listUtil"
 ensureImport "stringUtil"
 ensureImport "status"
+ensureImport "combat"
 
 // Thing: base class for anything that can appear in the world (or
 // inside a container).  These will be drawn as sprites, if image is
@@ -25,9 +26,14 @@ Thing.blocksMovement = false
 Thing.destroyed = false
 Thing._sprite = null	// cache; use .sprite method!
 
-Thing.Make = function(name=null, capacity=0)
+Thing.Make = function(name=null, iconIdxOrImage=null, capacity=0)
 	noob = new self
 	if name != null then noob.name = name
+	if iconIdxOrImage isa number then
+		self.iconIdx = iconIdxOrImage
+	else if iconIdxOrImage isa Image then
+		self.image = iconIdxOrImage
+	end if
 	if capacity > 0 then
 		noob.capacity = capacity
 		noob.contents = []
@@ -206,8 +212,8 @@ globals.CombatAgent = new Agent
 CombatAgent.health = 100
 CombatAgent.statuses = null	// StatusHolder object
 
-CombatAgent.Make = function(name=null, capacity=100)
-	noob = super.Make(name, capacity)
+CombatAgent.Make = function(name=null, iconIdxOrImage=null, capacity=100)
+	noob = super.Make(name, iconIdxOrImage, capacity)
 	noob.statuses = StatusHolder.Make
 	return noob
 end function
@@ -240,6 +246,15 @@ Mob.FRIENDLY = "FRIENDLY" // Mob is friendly to the player
 Mob.disposition = Mob.NEUTRAL
 Mob.sightRadius = 10
 
+Mob.Make = function(name=null, iconIdxOrImage=null, capacity=100)
+	noob = super.Make(name, iconIdxOrImage, capacity)
+	// To support combat animations, mobs always need a sprite.
+	if noob.image == null and noob.iconIdx > 0 then
+		noob.image = oneBit.getTileImage(noob.iconIdx)
+	end if
+	return noob
+end function
+
 Mob.availableSteps = function
 	// Return a list of [dx, dy, distToPlayer] steps we can take from here,
 	// sorted in order of most-towards the player first.
@@ -270,7 +285,11 @@ Mob.update = function
 	avail = self.availableSteps
 	if not avail then return
 	if self.disposition == Mob.HOSTILE then
-		self.attemptMove avail[0][0], avail[0][1]
+		if playerDist < 2 then
+			combat.doMeleeAttack self, player
+		else
+			self.attemptMove avail[0][0], avail[0][1]
+		end if
 	else if self.disposition == Mob.FLEEING then
 		self.attemptMove avail[-1][0], avail[-1][1]	
 	end if
@@ -283,6 +302,7 @@ globals.Character = new CombatAgent
 
 // Class representing the player.
 globals.Player = new Character
+Player.name = "Player"
 Player.iconIdx = null
 Player.image = oneBit.getTileImage(25)
 
@@ -294,6 +314,19 @@ Player.handleCommand = function(cmd)
 	if cmd == "INVENTORY" then
 		ui.showInventory self
 		return 0
+	end if
+	dx = 0; dy = 0
+	if cmd == "NORTH" then dy = 1
+	if cmd == "SOUTH" then dy = -1
+	if cmd == "EAST" then dx = 1
+	if cmd == "WEST" then dx = -1
+	if dx or dy then
+		// check for mob to melee attack in this direction
+		mob = level.getMob(self.x + dx, self.y + dy)
+		if mob then
+			combat.doMeleeAttack self, mob
+			return 1
+		end if
 	end if
 	return super.handleCommand(cmd)
 end function

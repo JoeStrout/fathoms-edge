@@ -65,6 +65,15 @@ getItems = function(x, y)
 	return result
 end function
 
+getMob = function(x, y)
+	if things[x][y] != null then
+		for thing in things[x][y]
+			if thing isa Mob then return thing
+		end for
+	end if
+	return null
+end function
+
 moveThing = function(thing, newX, newY)
 	if 0 <= thing.x < width and 0 <= thing.y < height and things[thing.x][thing.y] then
 		things[thing.x][thing.y].removeVal thing

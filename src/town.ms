@@ -10,8 +10,7 @@ load = function
 	level.clearToSize 40, 30
 	mapTools.fillTiles disp.background, [1,5,5,5], "#006600", 50
 	
-	Tree = Obstacle.Make("tree")
-	Tree.iconIdx = 211
+	Tree = Obstacle.Make("tree", 211)
 	Tree.color = color.brown
 	for i in range(20)
 		tree = new Tree
@@ -20,20 +19,17 @@ load = function
 		disp.overlay.setCellTint tree.x, tree.y+1, "#88FF88"
 	end for
 	
-	bone = Item.Make("bone")
-	bone.iconIdx = 784
+	bone = Item.Make("bone", 784)
 	bone.color = "#CCCCCC"
 	bone.size = 2
 	bone.placeOnMap 8, 3
 	
-	apple = Food.Make("apple")
-	apple.iconIdx = 943
+	apple = Food.Make("apple", 943)
 	apple.color = "#FF4444"
 	apple.value = 2
 	apple.placeOnMap 10, 15
 	
-	Shroom = Food.Make("shroom")
-	Shroom.image = file.loadImage("/usr/pics/shroom.png")
+	Shroom = Food.Make("shroom", file.loadImage("/usr/pics/shroom.png"))
 	Shroom.Colors = [color.red, color.green, color.brown, color.yellow,
 	  "#CCCCFF", "#CCCCCC", "#CCCCAA"]
 	Shroom.size = 1
@@ -72,8 +68,7 @@ load = function
 		shroom.placeOnMap floor(40*rnd), floor(30*rnd)
 	end for
 	
-	Rat = Mob.Make("rat")
-	Rat.iconIdx = 287
+	Rat = Mob.Make("rat", 287)
 	Rat.color = color.brown
 	Rat.disposition = Mob.FLEEING
 	for i in range(2)
@@ -81,8 +76,7 @@ load = function
 		rat.placeOnMap floor(40*rnd), floor(30*rnd)
 	end for	
 	
-	Slime = Mob.Make("slime")
-	Slime.iconIdx = 283
+	Slime = Mob.Make("slime", 283)
 	Slime.color = color.lime
 	Slime.disposition = Mob.HOSTILE
 	for i in range(2)
