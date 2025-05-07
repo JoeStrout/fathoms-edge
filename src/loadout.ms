@@ -154,7 +154,8 @@ end function
 
 Loadout.DrawSlotIcon = function(slot, x, y)
 	if slot == TWOHAND then
-		// ToDo
+		gfx.drawImage slotIcon[OFFHAND], x - 12, y
+		gfx.drawImage slotIcon[MAINHAND], x + 0, y
 	else
 		gfx.drawImage slotIcon[slot], x - slotIcon[slot].width/2, y
 	end if

@@ -95,7 +95,7 @@ load = function
 	Slime.damage.physical = 3
 	for i in range(2)
 		slime = Slime.Make
-		if rnd < 1.5 then slime.contain new Ring
+		if rnd < 0.5 then slime.contain new Ring
 		slime.placeOnMap floor(40*rnd), floor(30*rnd)
 	end for
 	

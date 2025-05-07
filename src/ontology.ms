@@ -27,9 +27,14 @@ Thing.name = "thing"
 Thing.blocksMovement = false
 Thing.destroyed = false
 Thing._sprite = null	// cache; use .sprite method!
+Thing.ByID = {}    // key: id number; value: Thing
+Thing._NextId = 1
 
 Thing.Make = function(name=null, iconIdxOrImage=null, capacity=0)
 	noob = new self
+	noob.id = Thing._NextId
+	Thing._NextId += 1
+	Thing.ByID[noob.id] = noob
 	if name != null then noob.name = name
 	if iconIdxOrImage isa number then
 		noob.iconIdx = iconIdxOrImage
@@ -88,6 +93,7 @@ end function
 Thing.destroy = function
 	self.removeFromContainer
 	self.destroyed = true
+	Thing.ByID.remove self.id
 end function
 
 // Thing.nameWithArticle: return the name of this item, prefixed
@@ -259,24 +265,29 @@ CombatAgent.update = function
 	// update status effects
 	self.statuses.update
 	
-	// update resistance and attack info (starting by resetting to whatever
-	// the parent class has, and then applying modifiers from equipment and
-	// status effects)
+	// update resistance and attack info
 	parentClass = self.__isa
 	self.attacksPerTurn = parentClass.attacksPerTurn
 	self.resistance = parentClass.resistance
-	if not self.resistance then self.resistance = new Resistance
-	self.damage = parentClass.damage
-	if not self.damage then self.damage = Damage.Default
+	if self.resistance == null then self.resistance = new Resistance
 	self.attackDodgeMod = parentClass.attacksPerTurn
+	damage = null  // (weapon damage)
 	
 	for item in self.loadout.items
 		self.resistance = self.resistance.add(item.resistance)
-		self.damage = self.damage.add(item.damage)
+		if damage then damage = damage.add(item.damage) else damage = item.damage
 		if item.hasIndex("attackDodgeMod") then
 			self.attackDodgeMod += item.attackDodgeMod
 		end if
 	end for
+	// Damage: use that of the equipment, else the default empty-hand
+	// damage inherited from the parent class.
+	if damage and damage.any then
+		self.damage = damage
+	else
+		self.damage = parentClass.damage
+		if not self.damage then self.damage = Damage.Default
+	end if
 	
 	if self.statuses.hasStatus(status.STUNNED) then
 		self.attacksPerTurn = 0
@@ -405,7 +416,7 @@ globals.Player = new Character
 Player.name = "Player"
 Player.iconIdx = null
 Player.damage = new Damage
-Player.damage.physical = 2
+Player.damage.physical = 1  // set player empty-hand damage here
 
 Player.Make = function
 	noob = super.Make("Player", oneBit.getTileImage(25))
