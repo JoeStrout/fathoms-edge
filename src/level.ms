@@ -31,6 +31,8 @@ addThing = function(thing, x, y)
 	if 0 <= x < width and 0 <= y < height then
 		if things[x][y] == null then things[x][y] = []
 		things[x][y].push thing
+		thing.x = x
+		thing.y = y
 		if thing.image then
 			disp.sprite.sprites.push thing.sprite
 			thing.sprite.x = cellSize * x + cellSize/2
@@ -45,14 +47,14 @@ end function
 
 removeThing = function(thing)
 	if 0 <= thing.x < width and 0 <= thing.y < height and things[thing.x][thing.y] then
-		things[thing.x][thing.y].removeVal thing
+		things[thing.x][thing.y].removeRef thing
 		if thing.image then
 			disp.sprite.sprites.removeVal thing.sprite
 		else if disp.main.cell(thing.x, thing.y) == thing.iconIdx then
 			disp.main.setCell thing.x, thing.y, null
 		end if
 	end if
-	if thing isa Agent then agents.removeVal thing
+	if thing isa Agent then agents.removeRef thing
 end function
 
 getItems = function(x, y)
@@ -76,7 +78,7 @@ end function
 
 moveThing = function(thing, newX, newY)
 	if 0 <= thing.x < width and 0 <= thing.y < height and things[thing.x][thing.y] then
-		things[thing.x][thing.y].removeVal thing
+		things[thing.x][thing.y].removeRef thing
 	end if
 	if 0 <= newX < width and 0 <= newY < height then
 		if things[newX][newY] == null then things[newX][newY] = []

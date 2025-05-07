@@ -50,7 +50,9 @@ applyAttackEffect = function(attacker, defender)
 	defName = defender.nameWithArticle("the")
 	
 	// First, check for dodging
-	if chance(defender.dodge * defender.statuses.dodgeModifier) then
+	dodgePct = defender.dodge * defender.statuses.dodgeModifier -
+	  attacker.attackDodgeMod
+	if chance(dodgePct) then
 		attacker.note "{defName} dodges your attack!".fill(locals).capitalized
 		defender.note "You dodge {atkName}'s attack.".fill(locals)
 		return
@@ -59,7 +61,7 @@ applyAttackEffect = function(attacker, defender)
 	// Then, apply damage.
 	dam = defender.resistance.apply(attacker.damage)
 	if not dam.any then
-		attacker.nonte "You attack {defName}, but do no damage!".fill(locals)
+		attacker.note "You attack {defName}, but do no damage!".fill(locals)
 		defender.note "{atkName} attacks you, but does no damage.".
 		  fill(locals).capitalized
 	else

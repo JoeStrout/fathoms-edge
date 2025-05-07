@@ -5,6 +5,7 @@
 import "importUtil"
 ensureImport "qa"
 ensureImport "listUtil"
+ensureImport "miscUtil"
 
 // Define the base slots.  Loadout goes in one of these.
 MAINHAND = "Main Hand"
@@ -41,9 +42,9 @@ Loadout.items = function
 		item = self[slot]
 		if item isa list then
 			for subitem in item
-				if result.indexOf(subitem) == null then result.push subitem
+				if result.refIndexOf(subitem) == null then result.push subitem
 			end for
-		else if item and result.indexOf(item) == null then
+		else if item and result.refIndexOf(item) == null then
 			result.push item
 		end if
 	end for
@@ -63,7 +64,7 @@ Loadout.equip = function(item)
 			self[RING] = [item]
 		else
 			qa.assert self[RING] isa list
-			if self[RING].indexOf(item) != null then return true
+			if self[RING].refIndexOf(item) != null then return true
 			self[RING].push item
 			if self[RING].len > 2 then self[RING].pull
 		end if
@@ -96,11 +97,11 @@ Loadout.unequip = function(item)
 	if item.hasIndex("cursed") and item.cursed then return false
 	found = false
 	for slot in slotsExceptTwoHand
-		if self[slot] == item then
+		if refEquals(self[slot], item) then
 			self[slot] = null
 			found = true
-		else if self[slot] isa list and self[slot].contains(item) then
-			self[slot].removeVal item
+		else if self[slot] isa list and self[slot].containsRef(item) then
+			self[slot].remove self[slot].refIndexOf(item)
 			if self[slot].len == 0 then self[slot] = null
 			found = true
 		end if
@@ -126,9 +127,9 @@ end function
 Loadout.slotOfItem = function(item)
 	if self[MAINHAND] == item and self[OFFHAND] == item then return TWOHAND
 	for slot in slotsExceptTwoHand
-		if self[slot] == item then return slot
+		if refEquals(self[slot], item) then return slot
 	end for
-	if self[RING] isa list and self[RING].contains(item) then return RING
+	if self[RING] isa list and self[RING].containsRef(item) then return RING
 	return null
 end function
 
@@ -168,10 +169,11 @@ runTests = function
 		if actual != expected then
 			print "Unit test failure (" + note + "): expected " + expected + ", got " + actual
 			outer.errorCount = errorCount + 1
+			exit
 		end if
 	end function
 
-	eq = new Loadout
+	globals.eq = new Loadout
 	assertEqual eq.itemInSlot(FEET), null
 	assertEqual eq.itemInSlot(RING), null
 	
@@ -179,8 +181,8 @@ runTests = function
 	dagger = Equipment.Make("dagger", null, MAINHAND)
 	offDagger = Equipment.Make("offhand dagger", null, OFFHAND)
 	broadsword = Equipment.Make("broadsword", null, TWOHAND)
-	ring1 = Equipment.Make("ring1", null, RING)
-	ring2 = Equipment.Make("ring2", null, RING)
+	ring1 = Equipment.Make("ring", null, RING)
+	ring2 = Equipment.Make("ring", null, RING)
 	ring3 = Equipment.Make("ring3", null, RING)
 	boots = Equipment.Make("boots", null, FEET)
 	sandals = Equipment.Make("sandals", null, FEET)
@@ -231,6 +233,7 @@ runTests = function
 	assertEqual eq.slotOfItem(ring1), RING
 	assertEqual eq.slotOfItem(ring2), RING
 	assertEqual eq.itemInSlot(RING), [ring1, ring2]
+	assertEqual eq.items, [broadsword, ring1, ring2]
 
 	assertEqual eq.equip(ring3), true
 	assertEqual eq.slotOfItem(ring1), null

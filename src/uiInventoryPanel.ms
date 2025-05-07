@@ -118,6 +118,7 @@ drop = function(item)
 	outer.refresh = true
 	itemName = item.nameWithArticle
 	agent.note "Dropped {itemName}.".fill(locals)
+	agent.update
 	ui.update
 end function
 

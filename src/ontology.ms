@@ -71,7 +71,7 @@ end function
 // Thing.removeFromContainer: remove this item from its container, if any.
 Thing.removeFromContainer = function
 	if self.container and self.container.contents then
-		self.container.contents.removeVal self
+		self.container.contents.removeRef self
 	end if
 	self.container = null
 end function
@@ -234,18 +234,19 @@ end function
 // more like the player (able to speak, use weapons, etc.)
 globals.CombatAgent = new Agent
 CombatAgent.health = 100
-CombatAgent.statuses = null	  // StatusHolder object
-CombatAgent.damage = null     // Damage object (for current attack)
-CombatAgent.resistance = null // Resistance object
-CombatAgent.loadout = null    // Loadout object
-CombatAgent.dodge = 1         // % chance of dodging
+CombatAgent.statuses = null	   // StatusHolder object
+CombatAgent.damage = null      // Damage object (for current attack)
+CombatAgent.resistance = null  // Resistance object
+CombatAgent.loadout = null     // Loadout object
+CombatAgent.dodge = 1          // % chance of dodging
+CombatAgent.attackDodgeMod = 0 // modifier to defender's dodge when attacking
+CombatAgent.attacksPerTurn = 1 // how many attacks we get per turn
 CombatAgent.leavesCorpse = false
 
 CombatAgent.Make = function(name=null, iconIdxOrImage=null, capacity=100)
 	noob = super.Make(name, iconIdxOrImage, capacity)
 	noob.statuses = StatusHolder.Make
-	noob.damage = new Damage
-	noob.damage.physical = 1   // just to have something by default
+	noob.damage = Damage.Default
 	noob.resistance = new Resistance
 	noob.loadout = new Loadout
 	qa.assert noob.image, "CombatAgents must always have a sprite image"
@@ -255,15 +256,35 @@ end function
 CombatAgent.dead = function; return self.health <= 0; end function
 
 CombatAgent.update = function
-	// update resistance
-	r = new Resistance
-	for item in self.loadout.items
-		r = r.add(item.resistance)
-	end for
-	self.resistance = r
-
 	// update status effects
 	self.statuses.update
+	
+	// update resistance and attack info (starting by resetting to whatever
+	// the parent class has, and then applying modifiers from equipment and
+	// status effects)
+	parentClass = self.__isa
+	self.attacksPerTurn = parentClass.attacksPerTurn
+	self.resistance = parentClass.resistance
+	if not self.resistance then self.resistance = new Resistance
+	self.damage = parentClass.damage
+	if not self.damage then self.damage = Damage.Default
+	self.attackDodgeMod = parentClass.attacksPerTurn
+	
+	for item in self.loadout.items
+		self.resistance = self.resistance.add(item.resistance)
+		self.damage = self.damage.add(item.damage)
+		if item.hasIndex("attackDodgeMod") then
+			self.attackDodgeMod += item.attackDodgeMod
+		end if
+	end for
+	
+	if self.statuses.hasStatus(status.STUNNED) then
+		self.attacksPerTurn = 0
+	else
+		if self.statuses.hasStatus(status.HASTENED) then self.attacksPerTurn += 1
+		if self.statuses.hasStatus(status.SLOWED) then self.attacksPerTurn /= 2
+	end if
+
 end function
 
 CombatAgent.corpseName = function; return self.name + " corpse"; end function
@@ -286,7 +307,7 @@ CombatAgent.die = function
 		loot = self.contents
 		self.contents = null
 		for item in loot
-			level.addThing item
+			level.addThing item, self.x, self.y
 		end for
 	end if
 end function	
@@ -355,8 +376,18 @@ Mob.update = function
 	if not avail then return
 	if self.disposition == Mob.HOSTILE then
 		if playerDist < 2 then
-			combat.doMeleeAttack self, player
+			// attack!
+			if self.attacksPerTurn < 1 then
+				if turn % (1 / self.attacksPerTurn) == 0 then
+					combat.doMeleeAttack self, player
+				end if
+			else
+				for i in range(1, self.attacksPerTurn)
+					combat.doMeleeAttack self, player
+				end for
+			end if
 		else
+			// ToDo: implement movesPerTurn!
 			self.attemptMove avail[0][0], avail[0][1]
 		end if
 	else if self.disposition == Mob.FLEEING then
@@ -373,9 +404,12 @@ globals.Character = new CombatAgent
 globals.Player = new Character
 Player.name = "Player"
 Player.iconIdx = null
+Player.damage = new Damage
+Player.damage.physical = 2
 
 Player.Make = function
-	return super.Make("Player", oneBit.getTileImage(25))
+	noob = super.Make("Player", oneBit.getTileImage(25))
+	return noob
 end function
 
 Player.note = function(msg)

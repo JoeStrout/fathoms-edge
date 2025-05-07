@@ -78,11 +78,12 @@ load = function
 	
 	Rat = Mob.Make("rat", 287)
 	Rat.color = color.brown
-	Rat.disposition = Mob.FLEEING
+	Rat.disposition = Mob.HOSTILE
 	Rat.health = 5
 	Rat.leavesCorpse = true
+	Rat.attacksPerTurn = 2
 	for i in range(2)
-		rat = new Rat
+		rat = Rat.Make
 		rat.placeOnMap floor(40*rnd), floor(30*rnd)
 	end for	
 	
@@ -90,9 +91,11 @@ load = function
 	Slime.color = color.lime
 	Slime.disposition = Mob.HOSTILE
 	Slime.health = 10
+	Slime.attacksPerTurn = 0.5
+	Slime.damage.physical = 3
 	for i in range(2)
-		slime = new Slime
-		if rnd < 0.5 then slime.contain new Ring
+		slime = Slime.Make
+		if rnd < 1.5 then slime.contain new Ring
 		slime.placeOnMap floor(40*rnd), floor(30*rnd)
 	end for
 	

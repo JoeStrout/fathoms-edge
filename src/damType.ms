@@ -9,6 +9,12 @@ types = ["physical", "fire", "cold", "shock", "poison", "necrotic"]
 globals.Damage = {}
 for type in types; Damage[type] = 0; end for
 
+Damage.Default = function
+	result = new Damage
+	result.physical = 1
+	return result
+end function
+
 Damage.str = function
 	result = ""
 	for type in types
@@ -30,6 +36,15 @@ Damage.any = function
 		if self[type] then return true
 	end for
 	return false
+end function
+
+Damage.add = function(other)
+	qa.assert other isa Damage
+	result = self + {}
+	for type in types
+		result[type] += other[type]
+	end for
+	return result
 end function
 
 Damage.total = function
@@ -72,6 +87,7 @@ end function
 // Apply this resistance to the given damage; return a new Damage object
 // representing the final damage to apply.
 Resistance.apply = function(damage)
+	qa.assert damage isa Damage
 	result = damage + {}
 	for type in types
 		pct = 100 - self[type]

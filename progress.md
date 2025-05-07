@@ -41,5 +41,9 @@ The target gets a chance to Dodge the attack -- this is a skill, and provides so
 
 *Furniture:* Items too big to automatically pick up, like tables, chests, and crafting stations.  To move these, you would have to Use another item: _Hand Truck_.  The procedure would be: Use a Hand Truck while standing next to some furniture; it then picks up that item, keeping it next to you as you move around.  When you press a movement direction, if that's _toward_ the item (i.e. it's already in that direction), you move forward; otherwise, it just moves the item over to that side of you.  If that space is not empty, you just go bonk. You stop using it when you back directly away (or attempt to, even if that direction is blocked).  So to turn around with a hand truck, you have to have room to use the in-between direction.  All this would be mainly for arranging furniture in your house, though you could probably also use it in some dungeons to cheese a puzzle here and there.
 
+## May 7, 2025
 
+Implemented equipment and unarmed melee combat yesterday.  That's working well.  Today, weapons and ranged combat.
+
+Then I should probably tackle NPCs, including shopkeepers, and start thinking about laying out the town of Fathom's Edge.
 
