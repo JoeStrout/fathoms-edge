@@ -7,6 +7,15 @@ globals.chance = function(percentChance)
 	return roll < percentChance
 end function
 
+// Get maximum of 2, 3, or 4 values.
+globals.max = function(a, b, c, d)
+	if a > b then result = a else result = b
+	if c and c > result then result = c
+	if d and d > result then result = d
+	return result
+end function
+
+
 // Get a non-hidden copy of refIndexOf (finding index of an item
 // by reference), since that is a thing we often need.
 list.refIndexOf = @list._refIndexOf

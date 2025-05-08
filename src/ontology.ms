@@ -166,6 +166,12 @@ Equipment.useBy = function(agent)
 	agent.loadout.equip self
 end function
 
+// Weapon: an Equipment item you can attack with.
+globals.Weapon = new Equipment
+Weapon.attackDodgeMod = 0  // e.g., -10 reduces defender dodge by 10%
+Weapon.attackRange = 1	// 1 for melee, > 1 for ranged weapons
+
+
 // Agent: things with agency, i.e., they get updates and can take actions.
 // This includes things like magic fountains that change their state over
 // time, etc.
@@ -246,6 +252,7 @@ CombatAgent.resistance = null  // Resistance object
 CombatAgent.loadout = null     // Loadout object
 CombatAgent.dodge = 1          // % chance of dodging
 CombatAgent.attackDodgeMod = 0 // modifier to defender's dodge when attacking
+CombatAgent.attackRange = 1    // 1 for melee, >1 for ranged
 CombatAgent.attacksPerTurn = 1 // how many attacks we get per turn
 CombatAgent.leavesCorpse = false
 
@@ -271,13 +278,15 @@ CombatAgent.update = function
 	self.resistance = parentClass.resistance
 	if self.resistance == null then self.resistance = new Resistance
 	self.attackDodgeMod = parentClass.attacksPerTurn
+	self.attackRange = parentClass.attackRange
 	damage = null  // (weapon damage)
 	
 	for item in self.loadout.items
 		self.resistance = self.resistance.add(item.resistance)
 		if damage then damage = damage.add(item.damage) else damage = item.damage
-		if item.hasIndex("attackDodgeMod") then
+		if item isa Weapon then
 			self.attackDodgeMod += item.attackDodgeMod
+			self.attackRange = max(self.attackRange, item.attackRange)
 		end if
 	end for
 	// Damage: use that of the equipment, else the default empty-hand
@@ -431,6 +440,22 @@ Player.handleCommand = function(cmd)
 	if cmd == "INVENTORY" then
 		ui.showInventory self
 		return 0
+	else if cmd == "TARGET" then
+		combat.selectNextTarget player.attackRange + 0.9
+		return 0
+	else if cmd == "ATTACK" then
+		target = combat.currentTarget
+		if target == null then
+			combat.selectNextTarget player.attackRange + 0.9
+			target = combat.currentTarget
+			if target == null then return 0
+		end if
+		if player.attackRange > 1 then
+			combat.doRangedAttack player, target
+		else
+			combat.doMeleeAttack player, target
+		end if
+		return 1
 	end if
 	dx = 0; dy = 0
 	if cmd == "NORTH" then dy = 1

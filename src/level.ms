@@ -18,12 +18,18 @@ things = null	// 2D array containing list of things for each x,y cell
 agents = []		// flat list of agents on the level
 
 clearToSize = function(width, height)
+	outer.width = width
+	outer.height = height
 	for d in [disp.background, disp.main, disp.overlay]
 		d.extent = [width, height]
 		d.clear
 	end for
 	disp.sprite.clear
 	outer.things = list.init2d(width, height, null)
+end function
+
+inBounds = function(x,y)
+	return 0 <= x < width and 0 <= y < height
 end function
 
 addThing = function(thing, x, y)
@@ -35,8 +41,7 @@ addThing = function(thing, x, y)
 		thing.y = y
 		if thing.image then
 			disp.sprite.sprites.push thing.sprite
-			thing.sprite.x = cellSize * x + cellSize/2
-			thing.sprite.y = cellSize * y + cellSize/2
+			disp.positionSprite thing.sprite, x, y
 		else if thing.iconIdx then
 			disp.main.setCell x, y, thing.iconIdx
 			disp.main.setCellTint x, y, thing.color
@@ -68,7 +73,7 @@ getItems = function(x, y)
 end function
 
 getMob = function(x, y)
-	if things[x][y] != null then
+	if inBounds(x, y) and things[x][y] != null then
 		for thing in things[x][y]
 			if thing isa Mob then return thing
 		end for
@@ -77,10 +82,10 @@ getMob = function(x, y)
 end function
 
 moveThing = function(thing, newX, newY)
-	if 0 <= thing.x < width and 0 <= thing.y < height and things[thing.x][thing.y] then
+	if inBounds(thing.x, thing.y) and things[thing.x][thing.y] then
 		things[thing.x][thing.y].removeRef thing
 	end if
-	if 0 <= newX < width and 0 <= newY < height then
+	if inBounds(newX, newY) then
 		if things[newX][newY] == null then things[newX][newY] = []
 		things[newX][newY].push thing
 	end if

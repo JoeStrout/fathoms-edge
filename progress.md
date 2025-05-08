@@ -50,3 +50,12 @@ Then I should probably tackle NPCs, including shopkeepers, and start thinking ab
 Ran into some thorny bugs today related to identical objects.  Specifically, I had slimes dropping rings of protection, all identical (and identical to the one I just placed on the ground to begin with).  The standard behavior in MiniScript is to compare objects by their contents, so things like indexOf (and removeVal) would find the first _equivalent_ object instead of the specific instance I was looking for.
 
 I've fixed that by adding some stuff in miscUtil to find and remove objects in a list by reference, which is probably faster as well as more correct in this case.  It seems to work.  Still, I wonder if this is going to be an ongoing headache, and maybe I should just side-step it by having Thing.Make assign a unique ID to each object as it's created.  That would make them all unique, whether compared by value or by reference.
+
+## May 8, 2025
+
+I did end up adding a unique ID to each object, but I'm still going to try to maintain a habit of matching objects by reference whenever that makes sense (i.e., they represent unique "things" in the game, rather than values or locations).
+
+Yesterday I got melee weapons working (giving the player a two-handed sword), but didn't get to ranged attacks.  I've done that today: the player now starts with a "wand of frost" that deals 2 Cold damage up to 10 spaces away.  As a bonus, you can now do diagonal melee attacks too (via the "attack" button, K).  All seems to be working properly.
+
+
+

@@ -10,6 +10,7 @@
 import "importUtil"
 ensureImport "oneBit"
 
+cellSize = 30
 
 init = function
 	clear
@@ -17,6 +18,7 @@ init = function
 	outer.background = oneBit.prepareTileDisplay(7, 32, null, null, true)
 	
 	outer.main = oneBit.prepareTileDisplay(6, 32, null, null, true)
+	outer.cellSize = main.cellSize - main.overlap
 	
 	display(5).mode = displayMode.sprite
 	outer.sprite = display(5)
@@ -40,5 +42,18 @@ init = function
 	end for
 end function
 
+positionSprite = function(sprite, column, row)
+	sprite.x = cellSize * column + cellSize/2
+	sprite.y = cellSize * row + cellSize/2
+end function
+
+centerOn = function(column, row)
+	sx = (column - 13) * cellSize
+	sy = (row - 11) * cellSize
+	for d in [background, main, overlay, sprite]
+		d.scrollX = sx
+		d.scrollY = sy
+	end for
+end function
 
 init

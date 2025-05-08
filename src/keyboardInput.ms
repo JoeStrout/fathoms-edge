@@ -24,6 +24,8 @@ keys[" "] = "INTERACT"
 
 keys.i = "INVENTORY"
 
+keys.t = "TARGET"
+keys.k = "ATTACK"
 
 getNextCommand = function
 	while key.available
