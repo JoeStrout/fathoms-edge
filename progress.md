@@ -57,5 +57,44 @@ I did end up adding a unique ID to each object, but I'm still going to try to ma
 
 Yesterday I got melee weapons working (giving the player a two-handed sword), but didn't get to ranged attacks.  I've done that today: the player now starts with a "wand of frost" that deals 2 Cold damage up to 10 spaces away.  As a bonus, you can now do diagonal melee attacks too (via the "attack" button, K).  All seems to be working properly.
 
+## May 9, 2025
+
+On water: suppose water can be either "shallow" or "deep".  Upon entering shadow water, you get status WADING, which has effects similar to SLOWED or ENCUMBERED.  In deeper water, you get either SWIMMING or UNDERWATER, depending on how much weight you have on you.  You can be UNDERWATER for only three turns before you also get DROWNING, which does substantial damage (like maybe 1/3 of full health) every turn, unless you have a WATERBREATHING status from some magic.  And note that if you have WATERWALKING (again, from magic), then water tiles are treated just like smooth ground.
+
+It occurs to me that we may have some statuses that we want to use for internal bookkeeping, but not display for the user.  We could simply define those with parentheses, like "(WATERBREATHING)", and then not draw them in the UI.  Unless we want to draw them under some circumstances but not others — in this case, maybe only when it actually has any effect, i.e., you are UNDERWATER.  That would require some special logic.  Maybe it could be generalized as: only draw *this* status when *that* status is present.  Needs more thought.
+
+On hiding/sneaking: let's let the user manually toggle a HIDING status (key "H").  This merely indicates that they are *trying* to hide.  Then game logic will assign either HIDDEN or EXPOSED, based on hiding skill (if we have a skill system), movement, and environmental conditions including lighting.  To let the user practice/test this ability, it'd be fun to have somewhere in town where there is always a guard who will block your way unless you can sneak past him.
+
+That reminds me, do we want a day/night cycle?  If so, 1 minute per game turn feels about right.  So it would take half an hour to walk about one screen's width (the size of a small town, when outdoors, or a mansion-sized indoor space).  I think seasons would be going way overboard, and probably week/month cycles too; even to get through a single day is 1440 turns, which is a lot (though we could allow sleeping to pass the time more quickly, perhaps by interacting with a bed or chair).  So maybe we divide the day like this: 12 hours daylight, 10 hours darkness, and 1 hour twilight each in between.  Outdoor tiles would be tinted accordingly, and it would be much easier to get HIDDEN in twilight or darkness.  We could also allow for some magic rituals that have to be performed at night, or mobs that change their behavior at night.
+
+On monster spawning: let's not have them respawn.  The town will be (mostly) reset every time you load it; same with adventures.  Within an adventure, once you kill a mob, it stays dead until you exit and return.
+
+On defining levels: I'm thinking we give the designer a 256-entry palette of tile IDs, so that we can store them efficiently in a RawData (and binary file) with 1 byte per tile.  But each ID will map to an extended data structure defining the actual tiles to display for background, main, and overlay; and attributes like water, obstacle, etc.  Things in the world (including items and mobs) would be stored separately, probably in a GRFON file. We should have a level editor that lets you efficiently paint with this palette, and also place/remove things.  Note that an adventure can certainly be divided into different zones (levels), with portals or edge-connections between them.  
+
+A portal is a tile type that, when you interact with it (explicitly or implicitly by pushing into it), posts a little dialog asking whether you want to enter wherever it goes.  If you say yes, it loads the connecting level.  Edge-connections are similar but are tied to a particular edge of the map, and don't ask; you just go.
+
+On player progression: I kinda like Oblivion's system.  You start out with stats in the 5-20 range, but every time you level up, you get 12 points to add to these, though no more than 5 per stat and adding to no more than 3 stats; and stats cap at 100.  That gives you plenty of room for character specialization, at least until you start maxing out stats.  Let's see, if we have 8 different stats, you would max them all out around level 60.  That seems reasonable; we should probably try to scale things so that most characters never reach level 30.  In fact we could just _cap_ your level at 30, and offer no more levels or stat bonuses beyond that (and have NPCs around town saying "isn't it about time you retired?").
+
+Of course the challenge would be coming up with 8 stats that actually impact the game in a meaningful way.  One trick: separate the stat that determines how much you can carry (a hugely important quality-of-life stat) from the stat that determines how much melee damage you do (important for fighters).
+
+Possible stats:
+
+- Strength (STR) - Raw physical power affecting melee damage and breaking objects
+- Constitution (CON) - Hardiness affecting health points and physical damage resistance
+- Stamina (STA) - Affects carrying capacity, and resistance to poison and disease
+- Dexderity (DEX) - Affects dodge chance, attack speed (i.e. chance of bonus attack), and stealth
+- Intellect (INT) - Affects spell potency, trap detection, and crafting
+- Perception (PER) - Awareness affecting detection of hidden items, critical hit chance, and ranged damage
+- Willpower (WIL) - Mental fortitude affecting mana pool, resistance to mental effects, and concentration
+- Charisma (CHR) - Social influence affecting NPC reactions, prices, etc.
+
+Now, Oblivion doesn't track generic XP, but instead counts (hidden) points in specific skills, and when you level up a skill, it levels up your character, allowing you to add to stats.  But that seems too complex for this game.  So instead, maybe we just track XP, define an XP threshold for each level, and grant stat points as above; and then we derive skills from your stats.  For example, lock-picking might depend on Agility, Intellect, and Perception.
+
+For testing purposes, we can have a character-generator that builds a Warrior, Rogue, Ranger, or Mage archetype at any given level, by putting points into the corresponding stats in various proportions.
+
+That brings me to adventure levels.  I think it would be better if we can have our adventures try to auto-scale to the player's level, rather than recommend or restrict when players can enter.  That way, the player can play adventures in any order, they don't have to worry about advancing too quickly and missing out on some opportunities, etc.  The auto-archetype characters will be useful for testing, and we can probably also have some code to scale common monsters and items to player level.  Custom mobs/puzzles might require some extra code to scale their difficulty, or you could have some areas that require higher skills be optional side paths.  Care will be needed when it comes to special treasure; we don't want to grant a level-2 adventurer an ubersword that a level-25 warrior would use.  For such cases, either we could put a stat requirement on the item (e.g. "This item requires at least 60 MIGHT"), leading the player to store it until they are strong enough; or we just grant a weaker version of the item.
+
+
+
 
 
