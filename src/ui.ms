@@ -169,6 +169,12 @@ drawRightPanel = function
 	if not gotAny then font.print "None", x + 12, y, 1, gfx.color
 	y -= dy
 
+	y -= dy; font.print "I - Inventory", x, y, 1, c
+	y -= dy; font.print "K - Attack", x, y, 1, c
+	y -= dy; font.print "C - Cast", x, y, 1, c
+	
+	
+
 	
 	y = 10
 	for i in range(log.len - 1, 0, -1)

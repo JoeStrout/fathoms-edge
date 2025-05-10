@@ -94,6 +94,29 @@ For testing purposes, we can have a character-generator that builds a Warrior, R
 
 That brings me to adventure levels.  I think it would be better if we can have our adventures try to auto-scale to the player's level, rather than recommend or restrict when players can enter.  That way, the player can play adventures in any order, they don't have to worry about advancing too quickly and missing out on some opportunities, etc.  The auto-archetype characters will be useful for testing, and we can probably also have some code to scale common monsters and items to player level.  Custom mobs/puzzles might require some extra code to scale their difficulty, or you could have some areas that require higher skills be optional side paths.  Care will be needed when it comes to special treasure; we don't want to grant a level-2 adventurer an ubersword that a level-25 warrior would use.  For such cases, either we could put a stat requirement on the item (e.g. "This item requires at least 60 MIGHT"), leading the player to store it until they are strong enough; or we just grant a weaker version of the item.
 
+## May 10, 2025
+
+On magic: I think we should have a proper spell system, where you learn spells (from tomes/scrolls/trainers in the world), and cast them using mana.  Perhaps pressing "M" brings up a magic list — similar to the inventory list — and you prepare a spell in your off hand (precluding use of any item in that hand).  And then cast it with "C".  Targeted spells would use the same target as a ranged attack.  Scrolls are inventory items, but go in your off hand as well, and are also triggered with "C" (this is how non-magicians do magic).
+
+Spell power/effectiveness would scale with skill level.  Maybe we divide magic skills into three:
+
+- Offensive Magic (INT + DEX): fire/cold/necro attack spells.
+- Defensive Magic (INT + WIL): shield, healing, concealment spells.
+- Alteration Magic (INT + CHR): informative, buff/curse, and other odd spells.
+
+Perhaps like Oblivion, we'll chunk the skill into 5 levels of mastery.  So if your Offensive Magic skill is 30 (in the range 25-49), you cast Magic Missile II (and likewise level II of all other offensive spells).
+
+At character creation, it'd be good to let the player choose a starting class, though this really only determines your starting stats, spells, and inventory; after that you can develop your character however you like.  Maybe we start you out with the key stat for your class in the range 15-20, and all other stats in the range 5-10.
+
+To learn a new spell: find a Study Desk (an item in town, maybe in the mage guild hall) and interact with it.  It will prompt you to select a scroll (for a spell you don't already know) from your inventory.  It will then give you the odds of learning that spell (perhaps 1/6 to 5/6), based on your skill in that school.  Choose to attempt or not; the scroll is destroyed either way.
+
+Oh, and I had an idea about the UI.  We should add keycap glyphs to the screen font, and use that to show stuff like:
+
+- K: Sword of Mincing
+- C: Heal Self
+
+We could even use this in button captions to show the keyboard shortcut for those.  We could probably use the Unicode "circled alphanumerics" block for these... but blech, these are not in ASCII order, making them a PITA to use.  Probably better instead to just use a range in the Private Use area, U+E000 — U+F8FF.  These should be 27x27 pixels or so for the current 14-point font.
+
 
 
 
