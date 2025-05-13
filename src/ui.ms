@@ -18,6 +18,8 @@ smallPrinter.boldItalicFont = bmfFonts.Font.load("/sys/fonts/NotoSansBoldItalic-
 
 button9Slice = Image9Slice.make(file.loadImage("/usr/pics/button.png"))
 
+keyCapCode = 57344 // plus the ASCII value of the character
+
 textColor = "#88FF88"
 
 damColor = {
@@ -31,6 +33,25 @@ damColor = {
 tempG = new PixelDisplay
 
 log = []  // list of [turn number, message] pairs
+
+keyCap = function(asciiChar)
+	return char(asciiChar.code + keyCapCode)
+end function
+
+addKeyCapGlyphs = function
+	kpic = file.loadImage("/usr/pics/keyCaps.png")
+	w = kpic.width / 16
+	h = kpic.height / 8
+	for row in range(0, 7)
+		for col in range(0, 15)
+			idx = row * 16 + col
+			globals.charpic = kpic.getImage(col*w, (7-row)*h, w, h)
+			c = char(keyCapCode + idx)
+			smallPrinter.font.addChar c, charpic, 0, 3
+		end for
+	end for
+end function
+addKeyCapGlyphs
 
 _printToImage = function(styleRuns, bgColor="#000000", width=300, printer=null)
 	if printer == null then printer = smallPrinter
@@ -169,9 +190,10 @@ drawRightPanel = function
 	if not gotAny then font.print "None", x + 12, y, 1, gfx.color
 	y -= dy
 
-	y -= dy; font.print "I - Inventory", x, y, 1, c
-	y -= dy; font.print "K - Attack", x, y, 1, c
-	y -= dy; font.print "C - Cast", x, y, 1, c
+	y -= dy; font.print keyCap("I") + " - Inventory", x, y, 1, c
+	y -= dy; font.print keyCap("T") + " - Target", x, y, 1, c
+	y -= dy; font.print keyCap("K") + " - Attack", x, y, 1, c
+	y -= dy; font.print keyCap("C") + " - Cast", x, y, 1, c
 	
 	
 
@@ -237,7 +259,8 @@ demo = function
 	display(7).color = "#4444CC"
 	showAlert "This is a test of `showAlert`.  As you can see, " +
 	  "it supports *bold*, _italic_, and even *_bold italic_* text!" +
-	  "  Pretty ~~rad~~ ##useful##, amiright?"
+	  " We can show keys like " + keyCap("A") + " or " + keyCap("?") +
+	  " too.  Pretty ~~rad~~ ##useful##, amiright?"
 end function
 
 if locals == globals then

@@ -7,6 +7,7 @@ import "importUtil"
 ensureImport "stringUtil"
 ensureImport "listUtil"
 ensureImport "disp"
+ensureImport "tsv"
 
 globals.MapElement = {}
 MapElement.id = 0
@@ -154,6 +155,26 @@ MapElement.apply = function(x, y)
 	self.applyTileId disp.overlay, self.up2TileId, self.overlayTileColor, x, y + 2
 end function
 
+// Load and return a list of MapElement objects from a .tsv (tab-separated
+// value) file.
+MapElement.LoadFromFile = function(path)
+	globals.data = tsv.parseFile(path)
+	while data[-1].id == ""; data.pop; end while
+	maxId = val(data[-1].id)
+	result = [null] * (maxId+1)
+	print result.len
+	for d in data
+		// clear out empty columns
+		for k in d.indexes; if d[k] == "" then d.remove k; end for
+		// then create a MapElement out of it -- and possibly a previous one
+		if d.hasIndex("basedOnId") then
+			result[d.id] = new MapElement + result[d.basedOnId] + d
+		else
+			result[d.id] = new MapElement + d
+		end if
+	end for
+	return result
+end function
 
 test = function
 	globals.m = new MapElement

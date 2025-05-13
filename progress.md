@@ -128,6 +128,8 @@ I'm going to establish a pattern for these CSV files where I name a column with 
 
 I'm also going to include a `basedOnId`, which identifies a lower-numbered map element to inherit from for any blank entries in this one.  This will be handy, for example, to grab the standard grass (or dirt or whatever) background for any element that only needs to define the main tile, without having to repeat that background info over and over.  It will also work in cases where we have a bunch of related items, e.g., flowers of different colors, or water parts of different edge orientations, that should nonetheless share the same behavioral attributes.
 
+I've begun an implementation of this in mapElement.ms (with a data file at data/mapElements.csv).  Not reading from the file yet — which is where `basedOnId` will be applied — but the parsing and application of value options is working.  For tile IDs, I also support transforms; e.g. "42LF" means tile 42, left-flipped.
+
 
 
 
