@@ -15,24 +15,29 @@ cellSize = 30
 init = function
 	clear
 	
-	outer.background = oneBit.prepareTileDisplay(7, 32, null, null, true)
+	outer.bgColor = oneBit.prepareTileDisplay(7, 32, null, null, true)
+	bgColor.tileSet = Image.create(16, 16, color.white)
+	bgColor.clear 0
+	bgColor.setCellTint range(0, bgColor.extent[0]), range(0, bgColor.extent[1]), color.black
 	
-	outer.main = oneBit.prepareTileDisplay(6, 32, null, null, true)
+	outer.background = oneBit.prepareTileDisplay(6, 32, null, null, true)
+	
+	outer.main = oneBit.prepareTileDisplay(5, 32, null, null, true)
 	outer.cellSize = main.cellSize - main.overlap
 	
-	display(5).mode = displayMode.sprite
-	outer.sprite = display(5)
+	display(4).mode = displayMode.sprite
+	outer.sprite = display(4)
 	sprite.clear
 	
-	outer.overlay = oneBit.prepareTileDisplay(4, 32, null, null, true)
+	outer.overlay = oneBit.prepareTileDisplay(3, 32, null, null, true)
 	
-	display(3).mode = displayMode.pixel
-	outer.gfx = display(3)
+	display(2).mode = displayMode.pixel
+	outer.gfx = display(2)
 	globals.gfx = gfx
 	gfx.clear
 	
-	display(2).mode = displayMode.text
-	outer.text = display(2)
+	display(1).mode = displayMode.text
+	outer.text = display(1)
 	globals.text = text
 	text.clear
 	

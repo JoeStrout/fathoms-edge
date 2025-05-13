@@ -115,8 +115,18 @@ Oh, and I had an idea about the UI.  We should add keycap glyphs to the screen f
 - K: Sword of Mincing
 - C: Heal Self
 
-We could even use this in button captions to show the keyboard shortcut for those.  We could probably use the Unicode "circled alphanumerics" block for these... but blech, these are not in ASCII order, making them a PITA to use.  Probably better instead to just use a range in the Private Use area, U+E000 — U+F8FF.  These should be 27x27 pixels or so for the current 14-point font.
+We could even use this in button captions to show the keyboard shortcut for those.  We could probably use the Unicode "circled alphanumerics" block for these... but blech, these are not in ASCII order, making them a PITA to use.  Probably better instead to just use a range in the Private Use area, U+E000 — U+F8FF.  These should be 14x14 pixels or so for the current 14-point font.
 
+
+## May 12, 2025
+
+I've been thinking we would do most of our data files in GRFON, but it occurred to me this morning that in many cases, CSV would actually be neater.
+
+I think the most urgent priority at this point is to get a basic level editor and save/load system up and stumbling about.  This will use a palette of up to 256 "map elements", which defines the tile IDs and colors to use.  (Oh, and I think I should support background colors too; it doesn't always have to be black, though we should favor dark colors so that the light-colored things/agents on the map stand out.)
+
+I'm going to establish a pattern for these CSV files where I name a column with a $, like "bgColor$", and this will get stored on each object that way, e.g. someEntry["bgColors$"].  But then we'll have a method without the $, which parses that original value into a list (if commas are found) or plain value, and then cache the result shadowing the method.
+
+I'm also going to include a `basedOnId`, which identifies a lower-numbered map element to inherit from for any blank entries in this one.  This will be handy, for example, to grab the standard grass (or dirt or whatever) background for any element that only needs to define the main tile, without having to repeat that background info over and over.  It will also work in cases where we have a bunch of related items, e.g., flowers of different colors, or water parts of different edge orientations, that should nonetheless share the same behavioral attributes.
 
 
 
