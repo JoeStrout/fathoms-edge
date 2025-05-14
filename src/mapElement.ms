@@ -35,6 +35,7 @@ MapElement["up2TileColor$"] = "#AAAAAA"
 
 parseListOrString = function(s)
 	if s == null then return ""
+	if s isa number then return str(s)
 	if s.indexOf(",") == null then return s
 	s = s.replace(", ", ",")
 	return s.split(",")
@@ -95,8 +96,9 @@ MapElement.up2TileColor = function
 	return self.up2TileColor
 end function
 
-MapElement.pick = function(scalarOrList, x, y)
+pick = function(scalarOrList, x, y)
 	if scalarOrList isa list then
+		if x == null then return scalarOrList[0]
 		// reset our rnd generator based on the map position
 		rnd hash(x * 1567 + y); rnd
 		// and then draw a "random" element of the list accordingly
@@ -113,7 +115,7 @@ MapElement.applyTileId = function(td, tile, color, x, y)
 		return
 	end if
 	
-	tile = self.pick(tile, x, y)
+	tile = pick(tile, x, y)
 	if tile[-1] >= "A" then
 		c = tile[-1]
 		tile = tile[:-1]
@@ -143,16 +145,58 @@ MapElement.applyTileId = function(td, tile, color, x, y)
 		td.setCell x, y, val(tile)
 		td.setCellTransform x, y, 0
 	end if
-	td.setCellTint x, y, self.pick(color, x, y)
+	td.setCellTint x, y, pick(color, x, y)
+end function
+
+drawTileImage = function(tile, color, x, y)
+	if not tile then return
+	tint = pick(color)
+	tile = pick(tile)
+	if tile[-1] >= "A" then
+		c = tile[-1]
+		tile = tile[:-1]
+		img = oneBit.getTileImage(val(tile))
+		img = img.getImage  // (get a copy to mutate)
+		if c == "R" then // right
+			img.rotate -90
+		else if c == "L" then // left
+			img.rotate 90
+		else if c == "U" then // upside-down (180° rotation)
+			img.rotate 180
+		else if c == "F" then // flipped...
+			c = tile[-1]
+			tile = tile[:-1]
+			img = oneBit.getTileImage(val(tile))
+			img = img.getImage  // (get a copy to mutate)
+			img.flip
+			if c == "R" then  // right flipped
+				img.rotate -90
+			else if c == "L" then // left flipped
+				img.rotate 90
+			else if c == "U" then // upside-down and flipped
+				img.rotate 180
+			end if
+		end if
+	else
+		img = oneBit.getTileImage(val(tile))
+	end if
+	gfx.drawImage img, x, y, -1, -1, 0, 0, -1, -1, tint
 end function
 
 MapElement.apply = function(x, y)
-	disp.bgColor.setCellTint x, y, self.pick(self.bgColor, x, y)
+	disp.bgColor.setCellTint x, y, pick(self.bgColor, x, y)
 	self.applyTileId disp.background, self.bgTileId, self.bgTileColor, x, y
 	self.applyTileId disp.main, self.mainTileId, self.mainTileColor, x, y
 	self.applyTileId disp.overlay, self.overlayTileId, self.overlayTileColor, x, y
 	self.applyTileId disp.overlay, self.up1TileId, self.overlayTileColor, x, y + 1
 	self.applyTileId disp.overlay, self.up2TileId, self.overlayTileColor, x, y + 2
+end function
+
+MapElement.drawPaletteEntry = function(x,y)
+	gfx.fillRect x, y, 16, 16, pick(self.bgColor)
+	drawTileImage self.bgTileId, self.bgTileColor, x, y
+	drawTileImage self.mainTileId, self.mainTileColor, x, y
+	drawTileImage self.overlayTileId, self.overlayTileColor, x, y
 end function
 
 // Load and return a list of MapElement objects from a .tsv (tab-separated
@@ -162,7 +206,6 @@ MapElement.LoadFromFile = function(path)
 	while data[-1].id == ""; data.pop; end while
 	maxId = val(data[-1].id)
 	result = [null] * (maxId+1)
-	print result.len
 	for d in data
 		// clear out empty columns
 		for k in d.indexes; if d[k] == "" then d.remove k; end for

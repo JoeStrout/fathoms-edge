@@ -131,5 +131,10 @@ I'm also going to include a `basedOnId`, which identifies a lower-numbered map e
 I've begun an implementation of this in mapElement.ms (with a data file at data/mapElements.csv).  Not reading from the file yet — which is where `basedOnId` will be applied — but the parsing and application of value options is working.  For tile IDs, I also support transforms; e.g. "42LF" means tile 42, left-flipped.
 
 
+## May 14, 2025
+
+I've started on the map editor (mapEditor.cs).  I'll have it draw the palette on the right side of the screen, where the game UI normally goes.  It'll follow standard paint mechanics: click to toggle between foreground and background entry, drag to do more of the same, click palette or option-click map to select the current foreground entry, and a little button (and shortcut key?) to swap foreground and background.
+
+
 
 
