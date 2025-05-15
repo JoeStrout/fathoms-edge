@@ -148,7 +148,8 @@ MapElement.applyTileId = function(td, tile, color, x, y)
 	td.setCellTint x, y, pick(color, x, y)
 end function
 
-drawTileImage = function(tile, color, x, y)
+drawTileImage = function(tile, color, x, y, g=null)
+	if g == null then g = gfx
 	if not tile then return
 	tint = pick(color)
 	tile = pick(tile)
@@ -180,7 +181,7 @@ drawTileImage = function(tile, color, x, y)
 	else
 		img = oneBit.getTileImage(val(tile))
 	end if
-	gfx.drawImage img, x, y, -1, -1, 0, 0, -1, -1, tint
+	g.drawImage img, x, y, -1, -1, 0, 0, -1, -1, tint
 end function
 
 MapElement.apply = function(x, y)
@@ -192,11 +193,12 @@ MapElement.apply = function(x, y)
 	self.applyTileId disp.overlay, self.up2TileId, self.overlayTileColor, x, y + 2
 end function
 
-MapElement.drawPaletteEntry = function(x,y)
-	gfx.fillRect x, y, 16, 16, pick(self.bgColor)
-	drawTileImage self.bgTileId, self.bgTileColor, x, y
-	drawTileImage self.mainTileId, self.mainTileColor, x, y
-	drawTileImage self.overlayTileId, self.overlayTileColor, x, y
+MapElement.drawPaletteEntry = function(x, y, g=null)
+	if g == null then g = gfx
+	g.fillRect x, y, 16, 16, pick(self.bgColor)
+	drawTileImage self.bgTileId, self.bgTileColor, x, y, g
+	drawTileImage self.mainTileId, self.mainTileColor, x, y, g
+	drawTileImage self.overlayTileId, self.overlayTileColor, x, y, g
 end function
 
 // Load and return a list of MapElement objects from a .tsv (tab-separated
