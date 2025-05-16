@@ -135,6 +135,16 @@ I've begun an implementation of this in mapElement.ms (with a data file at data/
 
 I've started on the map editor (mapEditor.cs).  I'll have it draw the palette on the right side of the screen, where the game UI normally goes.  It'll follow standard paint mechanics: click to toggle between foreground and background entry, drag to do more of the same, click palette or option-click map to select the current foreground entry, and a little button (and shortcut key?) to swap foreground and background.
 
+## May 16, 2025
+
+Map editor is up and stumbling about.  Time to work out the file format.  I've been thinking of using RawData for the zone map, because it is fast to read and parse; I've seen text-based formats take noticeable seconds to load for a large map.
+
+So that's easy enough, but then I also have to consider the palette of up to 256 MapElement items.  These are much harder to store in a simple binary format because their length is highly variable.  And I'm already storing them in TSV, which works nicely.  But how to associate the two files?
+
+I guess for now I can punt, and just have a single palette that's used for all the stuff in town.  And maybe we later have just one per adventure — that doesn't seem too limiting, as 256 entries is really quite a lot.  Though I think I'll try to arrange it so that any blank spaces in the adventure palette are filled in with the town palette, and restrict my use of the town palette to the first 4 of every 8 slots, so that adventure designers can both make use of the town stuff (adding their related stuff next to it), and override the town stuff where desired.
+
+
+
 
 
 

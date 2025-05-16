@@ -4,10 +4,15 @@
 import "disp"
 import "mapElement"
 import "zone"
+import "textUtil"
+Dialog = textUtil.Dialog
 
 tempG = new PixelDisplay
 foreId = 1
 backId = 0
+
+palettePath = "/usr/data/mapElements.tsv"
+zonePath = "/usr/data/town.dat"
 
 Rect = {}
 Rect.Make = function(left, bottom, width, height)
@@ -67,7 +72,7 @@ handleMapClick = function
 	row = disp.rowForScreenY(mouse.y)
 	shift = key.pressed("left shift") or key.pressed("right shift")
 	alt = key.pressed("left alt") or key.pressed("right alt")
-	if shift or zone.mapElems[col][row] == zone.elemPalette[foreId] then
+	if shift or zone.element(col,row) == zone.elemPalette[foreId] then
 		penId = backId
 	else
 		penId = foreId
@@ -119,9 +124,26 @@ drawSwatches = function
 	drawSwatch backId, 890, 20, "Erase:"
 end function
 
+handleKey = function(k)
+	if k == "s" then
+		zone.saveElemMap zonePath
+		Dialog.make("Map Saved", zonePath).show
+	else if k == "q" or k == char(27) then
+		dlog = Dialog.make("Quit the map editor?", "Any unsaved changes will be lost.")
+		dlog.okBtn.caption = "Quit"
+		dlog.cancelBtn.visible = true
+		if dlog.show == dlog.cancelBtn then return
+		exit
+	end if
+end function
+
 setup = function
-	zone.elemPalette = MapElement.LoadFromFile("/usr/data/mapElements.tsv")
-	zone.clearToSize 40,30
+	zone.elemPalette = MapElement.LoadFromFile(palettePath)
+	if file.exists(zonePath) then
+		zone.loadElemMap zonePath
+	else
+		zone.clearToSize 40,30, 0
+	end if
 	drawPalette
 	drawSwatches
 end function
@@ -132,6 +154,7 @@ mainLoop = function
 		if mouse.button then
 			if not handlePaletteClick then handleMapClick
 		end if
+		if key.available then handleKey key.get
 	end while
 end function
 

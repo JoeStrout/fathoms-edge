@@ -26,7 +26,7 @@ OOBElement.blocksWalk = true
 OOBElement.blocksFly = true
 
 
-clearToSize = function(width, height)
+clearToSize = function(width, height, defaultElemIndex=null)
 	outer.width = width
 	outer.height = height
 	for d in [disp.bgColor, disp.background, disp.main, disp.overlay]
@@ -37,7 +37,16 @@ clearToSize = function(width, height)
 	disp.bgColor.setCellTint range(0, width), range(0, height), color.black
 	disp.sprite.clear
 	outer.things = list.init2d(width, height, null)
-	outer.mapElems = list.init2d(width, height, null)
+	defaultElem = null
+	if defaultElemIndex != null then defaultElem = elemPalette[defaultElemIndex]
+	outer.mapElems = list.init2d(width, height, defaultElem)
+	if defaultElem then
+		for y in range(height-1)
+			for x in range(0, width-1)
+				defaultElem.apply x, y
+			end for
+		end for
+	end if
 end function
 
 inBounds = function(x,y)
@@ -56,6 +65,42 @@ setElement = function(x, y, elementRefOrIndex)
 	else
 		mapElems[x][y] = elementRefOrIndex
 	end if
+end function
+
+// saveElemMap: write out our 2D array of MapElements, defining the
+// static contents of this zone, to the given file.
+saveElemMap = function(path)
+	rd = new RawData
+	rd.resize 4 + width * height
+	rd.setUshort 0, width
+	rd.setUshort 2, height
+	i = 4
+	for y in range(height-1)  // NOTE: top-down
+		for x in range(0, width-1)
+			if mapElems[x][y] == null then idx = 0 else idx = mapElems[x][y].id
+			rd.setByte i, idx
+			i += 1
+		end for
+	end for
+	file.saveRaw path, rd
+end function
+
+// loadElemMap: read our 2D array of MapElements, defining the
+// static contents of this zone, from the given file.
+loadElemMap = function(path)
+	globals.rd = file.loadRaw(path)
+	width = rd.ushort(0)
+	height = rd.ushort(2)
+	clearToSize width, height
+	i = 4
+	for y in range(height-1)  // NOTE: top-down
+		for x in range(0, width-1)
+			elem = elemPalette[rd.byte(i)]
+			mapElems[x][y] = elem
+			elem.apply x, y
+			i += 1
+		end for
+	end for
 end function
 
 addThing = function(thing, x, y)
