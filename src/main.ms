@@ -1,7 +1,7 @@
 import "importUtil"
 ensureImport "miscUtil"
 ensureImport "disp"
-ensureImport "level"
+ensureImport "zone"
 ensureImport "mapTools"
 ensureImport "ontology"
 ensureImport "town"
@@ -37,7 +37,7 @@ end function
 updateAll = function(newTurn=false)
 	if newTurn then
 		globals.turn += 1
-		for agent in level.agents
+		for agent in zone.agents
 			agent.update
 			if agent == player then disp.centerOn player.x, player.y
 		end for

@@ -3,11 +3,11 @@
 import "importUtil"
 ensureImport "disp"
 ensureImport "mapTools"
-ensureImport "level"
+ensureImport "zone"
 ensureImport "status"
 
 load = function
-	level.clearToSize 40, 30
+	zone.clearToSize 40, 30
 	mapTools.fillTiles disp.background, [1,5,5,5], "#006600", 50
 	
 	Tree = Obstacle.Make("tree", 211)

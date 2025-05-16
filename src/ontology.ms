@@ -64,11 +64,11 @@ Thing.placeOnMap = function(x, y)
 	self.removeFromMap
 	self.x = x
 	self.y = y
-	level.addThing self, x, y
+	zone.addThing self, x, y
 end function
 
 Thing.removeFromMap = function
-	level.removeThing self
+	zone.removeThing self
 	self.x = -1
 	self.y = -1
 end function
@@ -194,22 +194,22 @@ end function
 // success, false if we weren't able to move.
 Agent.attemptMove = function(dx, dy)
 	if self.container then return false	// can't move while in container
-	if not level.passable(self.x + dx, self.y + dy) then
+	if not zone.passable(self.x + dx, self.y + dy) then
 		// Bonk!
 		self.note "You can't move that way."
 		return false
 	end if
-	stuff = level.getItems(self.x + dx, self.y + dy)
+	stuff = zone.getItems(self.x + dx, self.y + dy)
 	for item in stuff
 		self.pickUp item
 	end for
-	level.moveThing self, self.x + dx, self.y + dy
+	zone.moveThing self, self.x + dx, self.y + dy
 	self.x += dx
 	self.y += dy
 	return true
 end function
 
-// Agent.pickUp: pick up an item currently in the level, and place it
+// Agent.pickUp: pick up an item currently in the zone, and place it
 // into our inventory.
 Agent.pickUp = function(item)
 	item.removeFromMap
@@ -320,14 +320,14 @@ end function
 
 CombatAgent.die = function
 	self.dead = true
-	level.removeThing self
+	zone.removeThing self
 	if self.leavesCorpse then
-		level.addThing self.makeCorpse, self.x, self.y
+		zone.addThing self.makeCorpse, self.x, self.y
 	else if self.contents then
 		loot = self.contents
 		self.contents = null
 		for item in loot
-			level.addThing item, self.x, self.y
+			zone.addThing item, self.x, self.y
 		end for
 	end if
 end function	
@@ -374,7 +374,7 @@ Mob.availableSteps = function
 			if not dx and not dy then continue
 			x = self.x + dx
 			y = self.y + dy
-			if level.passable(x, y, self) then
+			if zone.passable(x, y, self) then
 				d = mathUtil.distance([x,y], player)
 				result.push [dx, dy, d]
 			end if
@@ -464,7 +464,7 @@ Player.handleCommand = function(cmd)
 	if cmd == "WEST" then dx = -1
 	if dx or dy then
 		// check for mob to melee attack in this direction
-		mob = level.getMob(self.x + dx, self.y + dy)
+		mob = zone.getMob(self.x + dx, self.y + dy)
 		if mob then
 			combat.doMeleeAttack self, mob
 			return 1

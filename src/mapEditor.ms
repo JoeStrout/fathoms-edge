@@ -47,21 +47,22 @@ end function
 handlePaletteClick = function
 	if not palPos.contains(mouse) then return false
 	prevIdx = -1
+	shift = key.pressed("left shift") or key.pressed("right shift")
 	while mouse.button
 		yield
 		row = floor((palPos.top - mouse.y) / 16)
 		col = floor((mouse.x - palPos.left) / 16)
 		idx = row * 8 + col
 		if idx == prevIdx then continue
-		if key.pressed("left alt") or key.pressed("right alt") then
-			globals.backId = idx
-		else
-			globals.foreId = idx
-		end if
+		if shift then globals.backId = idx else globals.foreId = idx
 		drawSwatches
 		prevIdx = idx
 	end while
 	return true
+end function
+
+handleMapClick = function
+	
 end function
 
 drawSwatch = function(elemId, left=820, bottom=20, label="Draw to:")

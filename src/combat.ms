@@ -116,7 +116,7 @@ selectNextTarget = function(range)
 	if not _targets or _curTargetIdx >= _targets.len or range != _curTargetRange then
 		// Rebuild the target list, from closest to farthest.
 		outer._targets = []
-		for agent in level.agents
+		for agent in zone.agents
 			if not agent isa Mob or agent.disposition == Mob.FRIENDLY then continue
 			if refEquals(agent, player) then continue
 			agent.distToPlayer = mathUtil.distance(agent, player)

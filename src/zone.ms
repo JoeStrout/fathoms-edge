@@ -1,4 +1,4 @@
-// This module represents the currently loaded level map.
+// This module represents the currently loaded zone map.
 
 // Note that there is always just one, 2-dimensional map loaded at
 // a time.  If the game world has multiple levels, those will be
@@ -15,7 +15,7 @@ height = 25
 cellSize = disp.main.cellSize - disp.main.overlap
 
 things = null	// 2D array containing list of things for each x,y cell
-agents = []		// flat list of agents on the level
+agents = []		// flat list of agents in the zone
 
 clearToSize = function(width, height)
 	outer.width = width
