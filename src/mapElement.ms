@@ -189,8 +189,12 @@ MapElement.apply = function(x, y)
 	self.applyTileId disp.background, self.bgTileId, self.bgTileColor, x, y
 	self.applyTileId disp.main, self.mainTileId, self.mainTileColor, x, y
 	self.applyTileId disp.overlay, self.overlayTileId, self.overlayTileColor, x, y
-	self.applyTileId disp.overlay, self.up1TileId, self.overlayTileColor, x, y + 1
-	self.applyTileId disp.overlay, self.up2TileId, self.overlayTileColor, x, y + 2
+	if self.up1TileId then
+		self.applyTileId disp.overlay, self.up1TileId, self.overlayTileColor, x, y + 1
+	end if
+	if self.up2TileId then
+		self.applyTileId disp.overlay, self.up2TileId, self.overlayTileColor, x, y + 2
+	end if
 end function
 
 MapElement.drawPaletteEntry = function(x, y, g=null)

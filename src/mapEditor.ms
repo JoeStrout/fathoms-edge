@@ -124,6 +124,32 @@ drawSwatches = function
 	drawSwatch backId, 890, 20, "Erase:"
 end function
 
+drawMouseInfo = function(left = 780, bottom = 600)
+	w = 960 - left - 8
+	h = 640 - bottom - 8
+	gfx.fillRect left, bottom, w, h, color.black
+	if palPos.contains(mouse) then
+		row = floor((palPos.top - mouse.y) / 16)
+		col = floor((mouse.x - palPos.left) / 16)
+		idx = row * 8 + col
+		name = "(null)"
+		if idx < zone.elemPalette.len then
+			elem = zone.elemPalette[idx]
+			if elem then name = elem.name
+		end if		
+		gfx.print "MapElement:", left+2, bottom+h-16, color.silver, "small"
+	else
+		col = disp.colForScreenX(mouse.x)
+		row = disp.rowForScreenY(mouse.y)
+		elem = zone.element(col, row)
+		idx = elem.id
+		name = elem.name
+		gfx.print "Pos: " + col + ", " + row, left+2, bottom+h-16, color.silver, "small"
+	end if
+	gfx.print hex2(idx) + " (" + idx + "): " + name[:13],
+	  left+2, bottom+2, color.silver, "small"
+end function
+
 handleKey = function(k)
 	if k == "s" then
 		zone.saveElemMap zonePath
@@ -155,6 +181,7 @@ mainLoop = function
 			if not handlePaletteClick then handleMapClick
 		end if
 		if key.available then handleKey key.get
+		drawMouseInfo
 	end while
 end function
 
