@@ -8,28 +8,54 @@ import "importUtil"
 ensureImport "disp"
 ensureImport "listUtil"
 ensureImport "qa"
+ensureImport "mapElement"
 
 width = 40
 height = 25
 
 cellSize = disp.main.cellSize - disp.main.overlap
 
-things = null	// 2D array containing list of things for each x,y cell
+things = null	// 2D array containing list of things for each [x][y] cell
+mapElems = null	// 2D array of MapElement instance (static content), [x][y]
 agents = []		// flat list of agents in the zone
+elemPalette = [null] * 256	// palette of MapElements we draw from
+
+OOBElement = new MapElement
+OOBElement.name = "Out of Bounds"
+OOBElement.blocksWalk = true
+OOBElement.blocksFly = true
+
 
 clearToSize = function(width, height)
 	outer.width = width
 	outer.height = height
-	for d in [disp.background, disp.main, disp.overlay]
+	for d in [disp.bgColor, disp.background, disp.main, disp.overlay]
 		d.extent = [width, height]
 		d.clear
 	end for
+	disp.bgColor.clear 0
+	disp.bgColor.setCellTint range(0, width), range(0, height), color.black
 	disp.sprite.clear
 	outer.things = list.init2d(width, height, null)
+	outer.mapElems = list.init2d(width, height, null)
 end function
 
 inBounds = function(x,y)
 	return 0 <= x < width and 0 <= y < height
+end function
+
+element = function(x,y)
+	if 0 <= x < width and 0 <= y < height then return mapElems[x][y]
+	return OOBElement
+end function
+
+setElement = function(x, y, elementRefOrIndex)
+	if not inBounds(x, y) then return
+	if elementRefOrIndex isa number then
+		mapElems[x][y] = elemPalette[elementRefOrIndex]
+	else
+		mapElems[x][y] = elementRefOrIndex
+	end if
 end function
 
 addThing = function(thing, x, y)

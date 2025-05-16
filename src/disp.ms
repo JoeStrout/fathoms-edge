@@ -61,4 +61,12 @@ centerOn = function(column, row)
 	end for
 end function
 
+colForScreenX = function(screenX)
+	return floor((screenX + main.scrollX) / cellSize)
+end function
+
+rowForScreenY = function(screenY)
+	return floor((screenY + main.scrollY) / cellSize)
+end function
+
 init

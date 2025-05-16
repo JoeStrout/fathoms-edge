@@ -3,6 +3,7 @@
 
 import "disp"
 import "mapElement"
+import "zone"
 
 tempG = new PixelDisplay
 foreId = 1
@@ -33,7 +34,7 @@ drawPalette = function(left=800, bottom=80)
 		if col == 0 then
 			gfx.print hex2(i), x - 20, y + 1, color.silver, "small"
 		end if
-		if i < mapElements.len then elem = mapElements[i] else elem = null
+		if i < zone.elemPalette.len then elem = zone.elemPalette[i] else elem = null
 		if elem == null then
 			gfx.line x, y, x+16, y+16, color.red
 			gfx.line x+16, y, x, y+16, color.red			
@@ -62,7 +63,32 @@ handlePaletteClick = function
 end function
 
 handleMapClick = function
-	
+	col = disp.colForScreenX(mouse.x)
+	row = disp.rowForScreenY(mouse.y)
+	shift = key.pressed("left shift") or key.pressed("right shift")
+	alt = key.pressed("left alt") or key.pressed("right alt")
+	if shift or zone.mapElems[col][row] == zone.elemPalette[foreId] then
+		penId = backId
+	else
+		penId = foreId
+	end if
+	lastCol = -1; lastRow = -1
+	while mouse.button
+		yield
+		col = disp.colForScreenX(mouse.x)
+		row = disp.rowForScreenY(mouse.y)
+		if col == lastCol and row == lastRow then continue
+		lastCol = col; lastRow = row
+		if alt then
+			idx = zone.element(col, row).id
+			if idx < 0 then continue
+			if shift then globals.backId = idx else globals.foreId = idx
+			drawSwatches
+		else
+			zone.setElement col, row, penId
+			zone.elemPalette[penId].apply col, row
+		end if
+	end while
 end function
 
 drawSwatch = function(elemId, left=820, bottom=20, label="Draw to:")
@@ -70,9 +96,9 @@ drawSwatch = function(elemId, left=820, bottom=20, label="Draw to:")
 	h = 32
 	gfx.fillRect left-20, bottom-20, w+40, h+40, color.clear
 	pic = null
-	if elemId < mapElements.len and mapElements[elemId] then
+	if elemId < zone.elemPalette.len and zone.elemPalette[elemId] then
 		tempG.clear color.black, 16, 16
-		mapElements[elemId].drawPaletteEntry 0, 0, tempG
+		zone.elemPalette[elemId].drawPaletteEntry 0, 0, tempG
 		pic = tempG.getImage
 	end if
 	gfx.fillRect left, bottom, w, h, color.black
@@ -94,7 +120,8 @@ drawSwatches = function
 end function
 
 setup = function
-	globals.mapElements = MapElement.LoadFromFile("/usr/data/mapElements.tsv")
+	zone.elemPalette = MapElement.LoadFromFile("/usr/data/mapElements.tsv")
+	zone.clearToSize 40,30
 	drawPalette
 	drawSwatches
 end function
@@ -103,7 +130,7 @@ mainLoop = function
 	while true
 		yield
 		if mouse.button then
-			handlePaletteClick
+			if not handlePaletteClick then handleMapClick
 		end if
 	end while
 end function
