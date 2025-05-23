@@ -28,6 +28,8 @@ GLOWING = "GLOWING"
 MUTE = "MUTE"
 PANICKED = "PANICKED"
 SERENE = "SERENE"
+SWIMMING = "SWIMMING"
+WADING = "WADING"
 
 
 // A special "max" function which considers null to be greater
@@ -63,14 +65,14 @@ end function
 
 // Add a new status effect to this set of statuses.
 // Makes use of the global turn number.
-StatusHolder.apply = function(newStatus="BLESSED", duration=10)
+StatusHolder.apply = function(newStatus="BLESSED", duration=10, update=true)
 	endTurn = duration + turn // (yields null if duration is null)
 	if self.items.hasIndex(newStatus) then
 		self.items[newStatus] = max(self.items[newStatus], endTurn)
 	else
 		self.items[newStatus] = endTurn
 	end if
-	self.update
+	if update then self.update
 end function
 
 // Remove the given status effect.  This is used when a player
@@ -125,6 +127,10 @@ StatusHolder.update = function
 	self.cancelOut PANICKED, SERENE
 	self.cancelOut FROZEN, ONFIRE
 	if self.hasStatus(FROZEN) and self.hasStatus(WET) then self.remove WET	
+	if self.hasStatus(WADING) or self.hasStatus(SWIMMING) then
+		self.apply WET, 5, false
+		self.apply SLOWED, 1, false
+	end if
 end function
 
 

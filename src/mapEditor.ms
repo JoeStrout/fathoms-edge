@@ -10,6 +10,8 @@ Dialog = textUtil.Dialog
 tempG = new PixelDisplay
 foreId = 1
 backId = 0
+centerCol = 13
+centerRow = 11
 
 palettePath = "/usr/data/mapElements.tsv"
 zonePath = "/usr/data/town.dat"
@@ -160,6 +162,10 @@ handleKey = function(k)
 		dlog.cancelBtn.visible = true
 		if dlog.show == dlog.cancelBtn then return
 		exit
+	else if char(17) <= k <= char(20) then  // arrow: scroll
+		outer.centerCol += (k == char(18)) - (k == char(17))
+		outer.centerRow += (k == char(19)) - (k == char(20))
+		disp.centerOn centerCol, centerRow
 	end if
 end function
 

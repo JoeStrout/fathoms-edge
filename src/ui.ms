@@ -190,6 +190,7 @@ drawRightPanel = function
 	if not gotAny then font.print "None", x + 12, y, 1, gfx.color
 	y -= dy
 
+	c = "#CCCCCC"
 	y -= dy; font.print keyCap("I") + " - Inventory", x, y, 1, c
 	y -= dy; font.print keyCap("T") + " - Target", x, y, 1, c
 	y -= dy; font.print keyCap("K") + " - Attack", x, y, 1, c

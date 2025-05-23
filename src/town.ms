@@ -6,19 +6,13 @@ ensureImport "mapTools"
 ensureImport "zone"
 ensureImport "status"
 
+palettePath = "/usr/data/mapElements.tsv"
+zonePath = "/usr/data/town.dat"
+
 load = function
-	zone.clearToSize 40, 30
-	mapTools.fillTiles disp.background, [1,5,5,5], "#006600", 50
-	
-	Tree = Obstacle.Make("tree", 211)
-	Tree.color = color.brown
-	for i in range(20)
-		tree = new Tree
-		tree.placeOnMap floor(40*rnd), floor(30*rnd)
-		disp.overlay.setCell tree.x, tree.y+1, 179 // tree top
-		disp.overlay.setCellTint tree.x, tree.y+1, "#88FF88"
-	end for
-	
+	zone.elemPalette = MapElement.LoadFromFile(palettePath)
+	zone.loadElemMap zonePath
+
 	bone = Item.Make("bone", 784)
 	bone.color = "#CCCCCC"
 	bone.size = 2
@@ -62,19 +56,19 @@ load = function
 		agent.statuses.apply fx.any, 5  // (lasts 5 turns)
 	end function
 	
-	for i in range(5)
-		shroom = new Shroom
-		shroom.color = Shroom.Colors.any
-		shroom.placeOnMap floor(40*rnd), floor(30*rnd)
-	end for
-	
+//	for i in range(5)
+//		shroom = new Shroom
+//		shroom.color = Shroom.Colors.any
+//		shroom.placeOnMap floor(40*rnd), floor(30*rnd)
+//	end for
+//	
 	Ring = Equipment.Make("Ring of Protection", 907, loadout.RING)
 	Ring.resistance.fire = 10
 	Ring.resistance.cold = 10
 	Ring.resistance.shock = 5
-	
-	ring = new Ring
-	ring.placeOnMap 7, 9
+//	
+//	ring = new Ring
+//	ring.placeOnMap 7, 9
 	
 	Rat = Mob.Make("rat", 287)
 	Rat.color = color.brown

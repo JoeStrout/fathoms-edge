@@ -270,6 +270,12 @@ CombatAgent.dead = function; return self.health <= 0; end function
 
 CombatAgent.update = function
 	// update status effects
+	e = zone.element(self.x, self.y)
+	if e.waterDepth == 1 then
+		self.statuses.apply status.WADING, 1
+	else if e.waterDepth > 1 then
+		self.statuses.apply status.SWIMMING, 1
+	end if
 	self.statuses.update
 	
 	// update resistance and attack info
@@ -335,7 +341,7 @@ end function
 CombatAgent.makeCorpse = function
 	corpse = new Item
 	corpse.name = self.corpseName
-	corpse.iconIdx = 786
+	corpse.iconIdx = 480
 	corpse.color = color.gray
 	if self.contents then
 		corpse.contents = self.contents

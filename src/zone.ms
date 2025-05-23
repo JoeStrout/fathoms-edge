@@ -176,6 +176,8 @@ end function
 // Return whether the given x,y position can be passed by the given agent.
 passable = function(x, y, byAgent)
 	if x < 0 or x >= width or y < 0 or y >= height then return false
+	elem = mapElems[x][y]
+	if elem.blockWalk then return false // ToDo: handle flying
 	if things[x][y] == null then return true
 	for thing in things[x][y]
 		if thing.blocksMovement then return false
