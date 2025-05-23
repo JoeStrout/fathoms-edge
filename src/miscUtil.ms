@@ -1,5 +1,8 @@
 // Miscellaneous utility functions.
 
+import "importUtil"
+ensureImport "base64"
+
 // Roll against a % probability (0-100).
 // Return true on success, false on failure.
 globals.chance = function(percentChance)
@@ -34,3 +37,56 @@ list.removeRef = function(item)
 	idx = self._refIndexOf(item)
 	if idx != null then self.remove idx
 end function
+
+imageToBase64 = function(img)
+	raw = new RawData
+	raw.resize img.width * img.height / 8
+	outp = 0
+	d = 0
+	bits = 0
+	for y in range(img.height-1)
+		for x in range(0, img.width-1)
+			c = img.pixel(x, y)
+			d = d * 2 + (c[1:3] > "88" and c[-2:] > "88")
+			bits += 1
+			if bits == 8 then
+				raw.setByte outp, d
+				outp += 1
+				d = 0
+				bits = 0
+			end if
+		end for
+	end for
+	return base64.toBase64(raw)
+end function
+
+base64ToImage = function(b64)
+	globals.raw = base64.toRaw(b64)
+	w = sqrt(raw.len * 8)
+	h = floor(raw.len * 8 / w)
+	img = Image.create(w, h, color.clear)
+	inp = 0
+	bitmask = 0
+	for y in range(h-1)
+		for x in range(0, img.width-1)
+			if bitmask < 1 then
+				bitmask = 128
+				d = raw.byte(inp)
+				inp += 1
+			end if
+			if bitAnd(d, bitmask) then img.setPixel x, y, color.white
+			bitmask /= 2
+		end for
+	end for
+	return img
+end function
+
+// Example base64 string of a mushroom:
+// AAAAAAAAB8Ad8D/YP/we/Af4AAABwAHAA8AHwAOAAAA=
+
+if locals == globals then
+	img = file.loadImage("/usr/pics/shroom.png")
+	clear
+	gfx.drawImage img, 400, 500
+	print imageToBase64(img)
+end if

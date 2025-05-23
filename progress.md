@@ -143,8 +143,40 @@ So that's easy enough, but then I also have to consider the palette of up to 256
 
 I guess for now I can punt, and just have a single palette that's used for all the stuff in town.  And maybe we later have just one per adventure — that doesn't seem too limiting, as 256 entries is really quite a lot.  Though I think I'll try to arrange it so that any blank spaces in the adventure palette are filled in with the town palette, and restrict my use of the town palette to the first 4 of every 8 slots, so that adventure designers can both make use of the town stuff (adding their related stuff next to it), and override the town stuff where desired.
 
+## May 18, 2025
 
+I'm struggling a bit to decide how I want to represent items in a zone.  There are two aspects to this problem: (1) defining the _types_ of items that can be found, and (2) defining where they are actually found.
 
+For defining the types, in most cases it is about the same to do that in MiniScript code or in GRFON.  For example, we could say in GRFON:
 
+```
+RingOfProtection: {
+	_class: Equipment
+	name: Ring of Protection
+	iconIdx: 907
+	slot: RING
+	resistance: {
+		fire: 10
+		cold: 10
+		shock: 5
+	}
+}
+```
+...or in code:
+```
+	RingOfProtection = Equipment.Make("Ring of Protection", 907, loadout.RING)
+	RingOfProtection.resistance.fire = 10
+	RingOfProtection.resistance.cold = 10
+	RingOfProtection.resistance.shock = 5
+```
 
+I have a half-dozen items defined both ways.  But I skipped the shrooms in GRFON, because I want them to have random colors and effects, and it's harder to see how to do that in GRFON.  We could of course add support for those particular randomizers, but there will always be a need, on occasion, for some custom code.  So maybe it's easier to just define all item types in code.
+
+But we have to think about the modular adventures.  The intent is that you can bring items from one adventure to another — items defined by data, but _not_ with custom code.  So at some point, we need to be able to save at least any Item to a file and reconstitute it -- minus any custom code -- back into memory.  That will probably use GRFON or (since it's not intended to be human-editable) JSON, or perhaps even some binary format to discourage hacking (but probably not).  And this need doesn't apply to mobs, NPCs, etc., who would not be able to leave their home adventure (with the _possible_ exception of pets, but those would be a special case).
+
+So I'm leaning towards defining the types of all things in code, even though Items will be saved/loaded when you bring them home from an adventure.  For something like Shrooms, those should be refactored so that their color and effect are set upon creation (in the adventure), and after that they're stock items.  You could put custom adventure effects when (for example) something is eaten, but that would apply only if eaten during the adventure — once you take them back to town, they are ordinary consumables.
+
+(Note: "effect" should probably be a standard data structure, with values like `health` for how it affects your HP, deltas for each attribute, and arbitrary status effects mapped to how long those last; then we can apply these when consumables are eaten, when weapons strike a target, when equipment is worn, etc.  These sorts of effects would save/load with the item.)
+
+Another consideration: adventures need to level with the player character.  So, sometimes you might want to spawn more mobs, or different mobs/items (i.e. adjust their stats) based on the player level.  This would be far easier to do in code.  So, maybe thing placement should be in code as well.  Hmm.
 
