@@ -25,6 +25,8 @@ You Can...
 - ☐︎ Visit specialized shops in town: smith, alchemist, librarian, grocer
 - ☐ Create a new character with name, stats, & starting class/gear
 - ☐ Save and load a character/game from the startup menu
+- ☐ Toggle hide/sneak mode by pressing H
+- ☐ Visit a room that can be reached only by sneaking
 
 ## 0.5
 - ☐ Accumulate XP and level up

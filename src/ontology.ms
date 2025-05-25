@@ -22,18 +22,22 @@ Thing.image = null
 Thing.color = "#AAAAAA"
 Thing.container = null	// Container, if any (if null, item is on map)
 Thing.capacity = 0		// total size of items this can contain
-Thing.contents = null	// list of contents
+Thing.contents = null	// Inventory of contents
 Thing.name = "thing"
 Thing.blocksMovement = false
 Thing.destroyed = false
 Thing._sprite = null	// cache; use .sprite method!
 Thing.ByID = {}    // key: id number; value: Thing
-Thing._NextId = 1
+Thing._LastId = 0
+
+Thing.UnusedId = function
+	Thing._LastId += 1
+	return Thing._LastId
+end function
 
 Thing.Make = function(name=null, iconIdxOrImage=null, capacity=0)
 	noob = new self
-	noob.id = Thing._NextId
-	Thing._NextId += 1
+	noob.id = Thing.UnusedId
 	Thing.ByID[noob.id] = noob
 	if name != null then noob.name = name
 	if iconIdxOrImage isa number then
@@ -129,11 +133,31 @@ Obstacle.blocksMovement = true
 
 // Item: inanimate objects that agents can (usually) pick up.
 globals.Item = new Thing
-Item.size = 1
+Item.size = 1       // size *per item*
 Item.value = 1		// base value to buy/sell
 Item.usable = false
 Item.useBy = function(agent); end function
 Item.usedVerb = "used"
+Item.qty = 1        // how many are in this stack; or null if not stackable
+
+Item.stackable = function; return self.qty != null; end function
+
+Item.canStackWith = function(other)
+	if not refEquals(self.__isa, other.__isa) then return false
+	if not self.stackable or not other.stackable then return false
+	for kv in self
+		if kv.key == "qty" or kv.key == "id" then continue
+		if not other.hasIndex(kv.key) then return false
+		if @other[kv.key] != @kv.value then return false
+	end for
+	return true
+end function
+
+Item.nameWithQty = function
+	if self.qty > 1 then return self.qty + "× " + self.name
+	return self.name
+end function
+		
 
 // Food: items you can eat.
 globals.Food = new Item
