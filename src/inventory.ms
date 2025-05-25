@@ -4,6 +4,7 @@
 
 import "importUtil"
 ensureImport "miscUtil"
+ensureImport "qa"
 
 globals.Inventory = {}
 
@@ -45,9 +46,9 @@ Inventory.totalSize = function
 	return self.totalOf("size")
 end function
 
-Inventory.indexByName = function(itemName)
-	for i in items.indexes
-		if items[i].name == itemName then return i
+Inventory.indexOfName = function(itemName)
+	for i in self.items.indexes
+		if self.items[i].name == itemName then return i
 	end for
 	return null
 end function
@@ -100,7 +101,6 @@ end function
 // NOTE: to add an item to an Inventory object, call the add method
 // above.  Do not call push.  That doesn't work.
 Inventory.push = function(bogusParam)
-	ensureImport "qa"
 	qa.abort "Somebody called `push` on an Inventory object instead of `add`."
 end function
 
@@ -110,16 +110,19 @@ end function
 // return a new item representing the removed portion, and reduce the qty in
 // the existing stack accordingly.  In any case, return what was removed from
 // this inventory.
-Inventory.remove = function(curStack, qtyToTake=1)
+Inventory.removeItem = function(curStack, qtyToTake=1)
 	if qtyToTake < 0 then
 		if curStack.qty == null then qtyToTake = 1 else qtyToTake = curStack.qty
 	else if curStack.qty != null and qtyToTake > curStack.qty then
 		qtyToTake = curStack.qty
 	end if
 	
+	idx = self.items.refIndexOf(curStack)
+	qa.assert idx != null
+	
 	// Simple case: taking the entire stack.
-	if curStack.qty == null or qtyToRemove >= curStack.qty then
-		items.remove items.refIndexOf(curStack)
+	if curStack.qty == null or qtyToTake >= curStack.qty then
+		self.items.remove idx
 		return curStack
 	end if
 	
@@ -131,6 +134,23 @@ Inventory.remove = function(curStack, qtyToTake=1)
 	curStack.qty -= qtyToTake
 	return portionToTake
 end function
+
+Inventory.removeByName = function(itemName, qtyToTake=1)
+	idx = self.indexOfName(itemName)
+	if idx == null then return false
+	return self.removeItem(self.items[idx], qtyToTake)
+end function
+
+Inventory.removeByIndex = function(index, qtyToTake=1)
+	return self.removeItem(self.items[index], qtyToTake)
+end function
+
+// Don't call .remove on an Inventory; use one of the methods above
+// (removeItem, removeByName, or removeByIndex).
+Inventory.remove = function(bogusParam)
+	qa.abort "Somebody called `remove` on an Inventory object instead of `removeItem`."
+end function
+
 
 runUnitTests = function
 	ensureImport "ontology"
@@ -175,30 +195,37 @@ runUnitTests = function
 	assertEqual inv.str, "2× apple; 8× banana"
 	assertEqual inv.totalSize, 10
 	
-	taken = inv.remove(Food.Make("banana", 943))
+	taken = inv.removeByName("banana")
 	assertEqual taken.nameWithQty, "banana"
 	assertEqual inv.str, "2× apple; 7× banana"
-		
-	inv2 = Inventory.Make
+	
+	taken = inv.removeByIndex(0, -1)
+	assertEqual taken.nameWithQty, "2× apple"
+	assertEqual inv.str, "7× banana"
+	
+	bananas = inv.items[0]
+	taken = inv.removeItem(bananas, -1)
+	assertEqual taken, bananas
+	assertEqual inv.str, ""
+	
 	watermelon = Food.Make("watermelon")
 	watermelon.size = 4
 	watermelon.qty = 5
-	remainder = inv2.add(watermelon, -1)
-	assertEqual inv2.str, "2× watermelon"
+	remainder = inv.add(watermelon, -1)
+	assertEqual inv.str, "2× watermelon"
 	assertEqual remainder.nameWithQty, "3× watermelon"
-	assertEqual inv2.totalSize, 8
+	assertEqual inv.totalSize, 8
 
-	remainder = inv2.add(watermelon, -1)
+	remainder = inv.add(watermelon, -1)
 	assertEqual remainder, watermelon
-	assertEqual inv2.str, "2× watermelon"
+	assertEqual inv.str, "2× watermelon"
 	assertEqual remainder.nameWithQty, "3× watermelon"
 
-	remainder = inv2.add(Food.Make("apple", 943))
+	remainder = inv.add(Food.Make("apple", 943))
 	assertEqual remainder, null
-	assertEqual inv2.str, "2× watermelon; apple"
-	assertEqual inv2.totalSize, 9
+	assertEqual inv.str, "2× watermelon; apple"
+	assertEqual inv.totalSize, 9
 
-	
 	print "Inventory tests complete.  Failures: " + errorCount
 end function
 
