@@ -10,6 +10,7 @@ ensureImport "status"
 ensureImport "damType"
 ensureImport "loadout"
 ensureImport "combat"
+ensureImport "inventory"
 
 // Thing: base class for anything that can appear in the world (or
 // inside a container).  These will be drawn as sprites, if image is
@@ -46,8 +47,8 @@ Thing.Make = function(name=null, iconIdxOrImage=null, capacity=0)
 		noob.image = iconIdxOrImage
 	end if
 	if capacity > 0 then
-		noob.capacity = capacity
-		noob.contents = []
+		noob.contents = Inventory.Make
+		noob.contents.capacity = capacity
 	end if
 	return noob
 end function
@@ -80,7 +81,7 @@ end function
 // Thing.removeFromContainer: remove this item from its container, if any.
 Thing.removeFromContainer = function
 	if self.container and self.container.contents then
-		self.container.contents.removeRef self
+		self.container.contents.removeItem self
 	end if
 	self.container = null
 end function
@@ -89,8 +90,8 @@ end function
 Thing.contain = function(contentItem)
 	contentItem.removeFromContainer
 	contentItem.container = self
-	if self.contents == null then self.contents = []
-	self.contents.push contentItem
+	if self.contents == null then self.contents = Inventory.Make	// or fail?
+	self.contents.add contentItem
 end function
 
 // Thing.destroy: call this when you want to get rid of an item.
@@ -176,6 +177,8 @@ Equipment.usable = true
 Equipment.usedVerb = "equipped"
 Equipment.slot = loadout.MAINHAND
 Equipment.cursed = false
+Equipment.qty = null
+Equipment.stackable = false
 
 Equipment.Make = function(name=null, iconIdxOrImage=null, slot=null)
 	noob = super.Make(name, iconIdxOrImage)
@@ -204,6 +207,8 @@ Agent.iconIdx = 248
 Agent.color = "#FFFFFF"
 Agent.update = null
 Agent.blocksMovement = true
+Agent.qty = null
+Agent.stackable = false
 
 // Agent.note: this is called with short messages describing things
 // this agent does, or that happen to this agent.  If it's the Player,
@@ -354,7 +359,7 @@ CombatAgent.die = function
 	if self.leavesCorpse then
 		zone.addThing self.makeCorpse, self.x, self.y
 	else if self.contents then
-		loot = self.contents
+		loot = self.contents.items
 		self.contents = null
 		for item in loot
 			zone.addThing item, self.x, self.y

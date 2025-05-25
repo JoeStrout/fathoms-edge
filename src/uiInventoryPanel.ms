@@ -81,9 +81,9 @@ show = function(container, title="Inventory")
 	end while
 	
 	if not outer.hasIndex("boldFont") then init
-	items = container.contents
+	items = container.contents.items
 	if items == null then items = []
-	h = rowHeight * (container.contents.len + 3) + 32
+	h = rowHeight * (items.len + 3) + 32
 	
 	selItemIdx = -1
 	outer.refresh = true
