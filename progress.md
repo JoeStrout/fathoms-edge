@@ -180,3 +180,8 @@ So I'm leaning towards defining the types of all things in code, even though Ite
 
 Another consideration: adventures need to level with the player character.  So, sometimes you might want to spawn more mobs, or different mobs/items (i.e. adjust their stats) based on the player level.  This would be far easier to do in code.  So, maybe thing placement should be in code as well.  Hmm.
 
+
+## May 25, 2025
+
+I've created a [Road Map](roadmap.md) to help keep track of what needs to be done and in what order.  I won't be pedantic about it; this can be rearranged and I have no doubt I'll be adding stuff that I haven't yet thougth of (or have forgotten about today), but at least now when I sit down to do some work, I can always just tackle the next item on the list.  It also divides the work into "milestones," giving a more visible sense of progress.  I'm declaring version 0.1 done now, and will start on version 0.2.
+
