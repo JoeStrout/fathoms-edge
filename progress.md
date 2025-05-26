@@ -185,3 +185,11 @@ Another consideration: adventures need to level with the player character.  So, 
 
 I've created a [Road Map](roadmap.md) to help keep track of what needs to be done and in what order.  I won't be pedantic about it; this can be rearranged and I have no doubt I'll be adding stuff that I haven't yet thougth of (or have forgotten about today), but at least now when I sit down to do some work, I can always just tackle the next item on the list.  It also divides the work into "milestones," giving a more visible sense of progress.  I'm declaring version 0.1 done now, and will start on version 0.2.
 
+
+## May 26, 2025
+
+I've implemented item stacks.  Items will stack with identical items, as long as their .stackable property is true (which by default is true whenever .qty is not null).  I've tested picking up individual and multiple items, and dropping individual or multiple items, including the whole stack (shift-click the drop button, or press shift-D or X, to drop a whole stack at once).
+
+So I think that's all working, though it might be good to get some user testing to see if there are any item duplication or destruction exploits.
+
+Next on the to-do list is gold.  I'm inclined to treat gold as just an ordinary stackable item, with a value of 1 and a very low size (maybe 0.01).  Then we don't need so much special code; we can have gold on the map, in containers, or dropped by mobs, all for free.  We might want a bit of special code to keep gold sorted to the top of the inventory list.  Also, should we refer to it as "coins" rather than "gold"?  Hmm.

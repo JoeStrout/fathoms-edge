@@ -47,7 +47,7 @@ draw = function(h, items, loadout, title, selItemIdx = -1)
 		item = items[i]
 		if i == selItemIdx then
 			gfx.fillRect left+6, y-4, width-12, 18, "#4444AA"
-			btn = Button.Make("Drop", left + 100, yButton, ["d", "x"])
+			btn = Button.Make("Drop", left + 100, yButton, ["d", "D", "x", "X"])
 			btn.item = item
 			btn.action = function; drop self.item; end function
 			buttons.push btn
@@ -65,9 +65,9 @@ draw = function(h, items, loadout, title, selItemIdx = -1)
 		end if
 		loadout.drawSlotIconForItem item, xUse, y
 		item.drawIcon gfx, xIcon, y - 2
-		boldFont.print item.name, xName, y, 1, textColor
-		boldFont.printRight item.size, xSize, y, 1, textColor
-		boldFont.printRight item.value, xValue, y, 1, textColor
+		boldFont.print item.nameWithQty, xName, y, 1, textColor
+		boldFont.printRight item.totalSize, xSize, y, 1, textColor
+		boldFont.printRight item.totalValue, xValue, y, 1, textColor
 		y -= rowHeight
 	end for
 	return buttons
@@ -99,7 +99,7 @@ show = function(container, title="Inventory")
 				selItemIdx = (selItemIdx + items.len - 1) % items.len
 			else if k.code == 20 then // down
 				selItemIdx = (selItemIdx + 1) % items.len
-			else if k.code == 27 then // esc
+			else if k.code == 27 or k == "i" then // esc
 				break
 			else
 				for btn in btns; btn.handleKey(k); end for
@@ -112,8 +112,19 @@ show = function(container, title="Inventory")
 	gfx.fillRect 480 - width/2, 320 - h/2, width, h, color.clear
 end function
 
-drop = function(item)
-	agent.loadout.unequip item
+drop = function(item, qty=null)
+	if qty == null then
+		if key.shiftPressed then qty = item.qty else qty = 1
+	end if
+	if item.qty != null and qty < item.qty then
+		// split the stack and drop only one or some
+//		print "dropping only " + qty + " of " + item.nameWithQty
+		item = agent.contents.removeItem(item, qty)
+	else
+		// unequip/drop the whole stack
+//		print "dropping whole stack (" + item.qty + ")"
+		agent.loadout.unequip item
+	end if
 	item.placeOnMap agent.x, agent.y
 	outer.refresh = true
 	itemName = item.nameWithArticle
@@ -126,7 +137,7 @@ use = function(item)
 	item.useBy agent
 	outer.refresh = true
 	used = item.usedVerb.capitalized
-	itemName = item.nameWithArticle
+	itemName = item.nameWithArticle("a", true)
 	agent.note "{used} {itemName}.".fill(locals)
 	agent.update
 	ui.update

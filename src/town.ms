@@ -18,10 +18,13 @@ load = function
 	bone.size = 2
 	bone.placeOnMap 8, 3
 	
-	globals.apple = Food.Make("apple", 943)
-	apple.color = "#FF4444"
-	apple.value = 2
-	apple.placeOnMap 10, 15
+	for i in [0,1,2,4,5]
+		globals.apple = Food.Make("apple", 943)
+		apple.color = "#FF4444"
+		apple.value = 2
+		if i == 5 then apple.qty = 5
+		apple.placeOnMap 10+i, 12
+	end for
 	
 	Shroom = Food.Make("shroom", file.loadImage("/usr/pics/shroom.png"))
 	Shroom.Colors = [color.red, color.green, color.brown, color.yellow,
@@ -76,7 +79,7 @@ load = function
 	Rat.health = 5
 	Rat.leavesCorpse = true
 	Rat.attacksPerTurn = 2
-	for i in range(2)
+	for i in [] //range(2)
 		rat = Rat.Make
 		rat.placeOnMap floor(40*rnd), floor(30*rnd)
 	end for	
@@ -87,7 +90,7 @@ load = function
 	Slime.health = 10
 	Slime.attacksPerTurn = 0.5
 	Slime.damage.physical = 3
-	for i in range(2)
+	for i in [] // range(2)
 		slime = Slime.Make
 		if rnd < 0.5 then slime.contain new Ring
 		slime.placeOnMap floor(40*rnd), floor(30*rnd)

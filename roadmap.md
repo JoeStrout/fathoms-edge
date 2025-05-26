@@ -9,7 +9,7 @@ You Can...
 - ☑︎ Fight mobs that appear around town
 
 ## 0.2
-- ☐ Stack identical items in your inventory
+- ☑︎ Stack identical items in your inventory
 - ☐ Find and accumulate gold
 - ☐ Interact with objects like signs
 - ☐ Interact with containers (adding/removing items)

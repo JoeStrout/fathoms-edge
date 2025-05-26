@@ -32,6 +32,21 @@ list.containsRef = function(item)
 end function
 
 
+// Handy helpers for modifier keys.
+key.shiftPressed = function
+	return key.pressed("left shift") or key.pressed("right shift")
+end function
+
+key.altPressed = function
+	return key.pressed("left alt") or key.pressed("right alt")
+end function
+
+key.controlPressed = function
+	return key.pressed("left control") or key.pressed("right control")
+end function
+
+
+
 // Similarly, remove a list element by reference.
 list.removeRef = function(item)
 	idx = self._refIndexOf(item)
@@ -83,6 +98,30 @@ end function
 
 // Example base64 string of a mushroom:
 // AAAAAAAAB8Ad8D/YP/we/Af4AAABwAHAA8AHwAOAAAA=
+
+// Find the plural form of a regular noun.  Note: this does not handle
+// irregular nouns (e.g. man -> men, sheep -> sheep, etc).  It also does
+// not handle upper-case words (they must at least end in lower case).
+string.plural = function
+	s = self
+	if s == "" then return s
+	if s[-1] == "s" or s[-1] == "x" or s[-2:] == "sh" or s[-2:] == "ch" then
+		return s + "es"  // box -> boxes
+	else if s[-1] == "z" then
+		return s + "zes" // quiz -> quizzes
+	else if s[-1] == "y" then
+		if "aeoiu".indexOf(s[-2]) != null then return s + "s"  // boy -> boys
+		return s[:-1] + "ies"  // city -> cities
+	else if s[-1] == "f" then
+		return s[:-1] + "ves"  // leaf -> leaves
+	else if s[-2:] == "fe" then
+		return s[:-2] + "ves"  // life -> lives
+	else if s[-1] == "o" and "aeiou".indexOf(s[-2]) == null then
+		return s + "es"  // potato -> potatoes
+	else
+		return s + "s"  // car -> cars
+	end if
+end function
 
 if locals == globals then
 	img = file.loadImage("/usr/pics/shroom.png")

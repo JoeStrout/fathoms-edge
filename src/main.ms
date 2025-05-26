@@ -51,7 +51,7 @@ updateAll = function(newTurn=false)
 end function
 
 runMainLoop = function
-	updateAll
+	updateAll true
 	while not gameOver
 		yield
 		cmd = keyboardInput.getNextCommand

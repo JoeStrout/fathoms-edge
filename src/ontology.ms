@@ -53,6 +53,12 @@ Thing.Make = function(name=null, iconIdxOrImage=null, capacity=0)
 	return noob
 end function
 
+Thing.pluralName = function
+	s = self.name.plural
+	self.pluralName = s  // (calculate once, cache the result)
+	return s
+end function
+
 Thing.sprite = function
 	if not self.image then return null
 	if self._sprite == null then
@@ -65,6 +71,7 @@ Thing.sprite = function
 end function
 
 Thing.placeOnMap = function(x, y)
+//	if self isa Item then print "placing " + self.nameWithQty + " at " + x + "," + y
 	self.removeFromContainer
 	self.removeFromMap
 	self.x = x
@@ -81,7 +88,7 @@ end function
 // Thing.removeFromContainer: remove this item from its container, if any.
 Thing.removeFromContainer = function
 	if self.container and self.container.contents then
-		self.container.contents.removeItem self
+		self.container.contents.removeItem self, -1
 	end if
 	self.container = null
 end function
@@ -91,7 +98,7 @@ Thing.contain = function(contentItem)
 	contentItem.removeFromContainer
 	contentItem.container = self
 	if self.contents == null then self.contents = Inventory.Make	// or fail?
-	self.contents.add contentItem
+	self.contents.add contentItem, -1
 end function
 
 // Thing.destroy: call this when you want to get rid of an item.
@@ -106,8 +113,12 @@ end function
 // or whatever is appropriate for the kind of thing it is.  Note
 // that if aOrThe is "the", then we want a definite (rather than
 // indefinite) article.
-Thing.nameWithArticle = function(aOrThe="a")
+Thing.nameWithArticle = function(aOrThe="a", forceSingular=false)
 	// Default behavior:
+	if not forceSingular and self isa Item and self.qty > 1 then
+		if aOrThe == "the" then return "the " + self.nameWithQty
+		return self.nameWithQty
+	end if
 	if aOrThe == "the" then return "the " + self.name
 	if "aeiou".contains(self.name[0]) then return "an " + self.name
 	return "a " + self.name
@@ -132,10 +143,11 @@ Obstacle.iconIdx = 210
 Obstacle.blocksMovement = true
 
 
-// Item: inanimate objects that agents can (usually) pick up.
+// Item: inanimate objects that agents can (usually) pick up, or
+// a stack of identical items.
 globals.Item = new Thing
 Item.size = 1       // size *per item*
-Item.value = 1		// base value to buy/sell
+Item.value = 1		// base value (per item) to buy/sell
 Item.usable = false
 Item.useBy = function(agent); end function
 Item.usedVerb = "used"
@@ -147,7 +159,7 @@ Item.canStackWith = function(other)
 	if not refEquals(self.__isa, other.__isa) then return false
 	if not self.stackable or not other.stackable then return false
 	for kv in self
-		if kv.key == "qty" or kv.key == "id" then continue
+		if ["qty", "id", "pluralName"].indexOf(kv.key) != null then continue
 		if not other.hasIndex(kv.key) then return false
 		if @other[kv.key] != @kv.value then return false
 	end for
@@ -155,10 +167,24 @@ Item.canStackWith = function(other)
 end function
 
 Item.nameWithQty = function
-	if self.qty > 1 then return self.qty + "× " + self.name
+	if self.qty > 1 then return self.qty + " " + self.pluralName
 	return self.name
 end function
 		
+Item.totalSize = function
+	if self.qty == null then return self.size
+	return self.size * self.qty
+end function
+
+Item.totalValue = function
+	if self.qty == null then return self.value
+	return self.value * self.qty
+end function
+		
+Item.destroyOne = function
+	if self.qty == null or self.qty <= 1 then return self.destroy
+	self.qty -= 1
+end function
 
 // Food: items you can eat.
 globals.Food = new Item
@@ -167,7 +193,7 @@ Food.usedVerb = "ate"
 Food.healthGain = 5
 Food.useBy = function(agent)
 	if agent isa CombatAgent then agent.health += self.healthGain
-	self.destroy
+	self.destroyOne
 end function
 
 
@@ -241,10 +267,10 @@ end function
 // Agent.pickUp: pick up an item currently in the zone, and place it
 // into our inventory.
 Agent.pickUp = function(item)
+	if item.qty > 1 then what = item.nameWithQty else what = item.nameWithArticle
 	item.removeFromMap
 	self.contain item
-	itemName = item.nameWithArticle
-	self.note "Picked up {itemName}.".fill(locals)
+	self.note "Picked up {what}.".fill(locals)
 end function
 
 // Handle a command -- typically this is called on the Player, and the

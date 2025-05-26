@@ -119,6 +119,7 @@ Inventory.removeItem = function(curStack, qtyToTake=1)
 	
 	idx = self.items.refIndexOf(curStack)
 	qa.assert idx != null
+//	print "inv: removing " + qtyToTake + " of " + self.items[idx].name + " from index " + idx
 	
 	// Simple case: taking the entire stack.
 	if curStack.qty == null or qtyToTake >= curStack.qty then
@@ -131,6 +132,7 @@ Inventory.removeItem = function(curStack, qtyToTake=1)
 	portionToTake = curStack + {}
 	portionToTake.id = Thing.UnusedId
 	portionToTake.qty = qtyToTake
+	portionToTake.container = null
 	curStack.qty -= qtyToTake
 	return portionToTake
 end function
@@ -175,33 +177,33 @@ runUnitTests = function
 	
 	remainder = inv.add(Food.Make("apple", 943))
 	assertEqual remainder, null
-	assertEqual inv.str, "2× apple; banana"
+	assertEqual inv.str, "2 apples; banana"
 	
 	bananas = Food.Make("banana")
 	bananas.qty = 3
 	remainder = inv.add(bananas, 3)
 	assertEqual remainder, null
-	assertEqual inv.str, "2× apple; 4× banana"
+	assertEqual inv.str, "2 apples; 4 bananas"
 	
 	bananas = Food.Make("banana")
 	bananas.qty = 5
 	remainder = inv.add(bananas, 1)
-	assertEqual remainder.nameWithQty, "4× banana"
-	assertEqual inv.str, "2× apple; 5× banana"	
+	assertEqual remainder.nameWithQty, "4 bananas"
+	assertEqual inv.str, "2 apples; 5 bananas"
 	assertEqual bananas, remainder
 	
 	remainder = inv.add(remainder, -1)
 	assertEqual remainder.nameWithQty, "banana"
-	assertEqual inv.str, "2× apple; 8× banana"
+	assertEqual inv.str, "2 apples; 8 bananas"
 	assertEqual inv.totalSize, 10
 	
 	taken = inv.removeByName("banana")
 	assertEqual taken.nameWithQty, "banana"
-	assertEqual inv.str, "2× apple; 7× banana"
+	assertEqual inv.str, "2 apples; 7 bananas"
 	
 	taken = inv.removeByIndex(0, -1)
-	assertEqual taken.nameWithQty, "2× apple"
-	assertEqual inv.str, "7× banana"
+	assertEqual taken.nameWithQty, "2 apples"
+	assertEqual inv.str, "7 bananas"
 	
 	bananas = inv.items[0]
 	taken = inv.removeItem(bananas, -1)
@@ -212,18 +214,18 @@ runUnitTests = function
 	watermelon.size = 4
 	watermelon.qty = 5
 	remainder = inv.add(watermelon, -1)
-	assertEqual inv.str, "2× watermelon"
-	assertEqual remainder.nameWithQty, "3× watermelon"
+	assertEqual inv.str, "2 watermelons"
+	assertEqual remainder.nameWithQty, "3 watermelons"
 	assertEqual inv.totalSize, 8
 
 	remainder = inv.add(watermelon, -1)
 	assertEqual remainder, watermelon
-	assertEqual inv.str, "2× watermelon"
-	assertEqual remainder.nameWithQty, "3× watermelon"
+	assertEqual inv.str, "2 watermelons"
+	assertEqual remainder.nameWithQty, "3 watermelons"
 
 	remainder = inv.add(Food.Make("apple", 943))
 	assertEqual remainder, null
-	assertEqual inv.str, "2× watermelon; apple"
+	assertEqual inv.str, "2 watermelons; apple"
 	assertEqual inv.totalSize, 9
 
 	print "Inventory tests complete.  Failures: " + errorCount

@@ -107,6 +107,16 @@ addThing = function(thing, x, y)
 	qa.assert thing isa Thing and x isa number and y isa number
 	if 0 <= x < width and 0 <= y < height then
 		if things[x][y] == null then things[x][y] = []
+		if thing isa Item and thing.qty != null then
+//			print "adding " + thing.nameWithQty + " to zone at " + x + "," + y
+			for item in things[x][y]
+				if item isa Item and thing.canStackWith(item) then
+					// just add to the existing item stack!
+					item.qty += 1
+					return
+				end if
+			end for
+		end if
 		things[x][y].push thing
 		thing.x = x
 		thing.y = y
@@ -123,6 +133,7 @@ end function
 
 removeThing = function(thing)
 	if 0 <= thing.x < width and 0 <= thing.y < height and things[thing.x][thing.y] then
+//		print "removing " + thing.nameWithQty + " from zone at " + thing.x + "," + thing.y
 		things[thing.x][thing.y].removeRef thing
 		if thing.image then
 			disp.sprite.sprites.removeVal thing.sprite
