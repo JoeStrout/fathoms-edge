@@ -925,10 +925,16 @@ setupUI.draw = function
 	else if self.state == kNewFile then
 		self.width = 16
 		self.height = 16
-		b64 = self.inputAt(5, 16, "Base64 String: ")
+		b64 = self.inputAt(5, 16, "Base64 String or Icon ID: ")
 		self.path = ""
 		if b64 then
-			self.img = miscUtil.base64ToImage(b64)
+			if str(val(b64)) == b64 then
+				self.img = oneBit.getTileImage(val(b64))
+			else if b64.len < 30 then
+				self.img = oneBit.getTileImage(b64)
+			else
+				self.img = miscUtil.base64ToImage(b64)
+			end if
 		else
 			self.img = Image.create(16, 16, color.clear)
 		end if

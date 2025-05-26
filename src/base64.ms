@@ -76,7 +76,6 @@ toRaw = function(b64)
 		raw.setByte j, d
 		j += 3
 	end while
-	print "trim: " + trim
 	raw.resize raw.len - trim
 	return raw
 end function

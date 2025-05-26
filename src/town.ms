@@ -5,6 +5,7 @@ ensureImport "disp"
 ensureImport "mapTools"
 ensureImport "zone"
 ensureImport "status"
+ensureImport "commonItems"
 
 palettePath = "/usr/data/mapElements.tsv"
 zonePath = "/usr/data/town.dat"
@@ -24,6 +25,11 @@ load = function
 		apple.value = 2
 		if i == 5 then apple.qty = 5
 		apple.placeOnMap 10+i, 12
+	end for
+	
+	for i in range(0,4)
+		gold = Gold.Make(i+1)
+		gold.placeOnMap 10+i, 8
 	end for
 	
 	Shroom = Food.Make("shroom", file.loadImage("/usr/pics/shroom.png"))

@@ -113,6 +113,7 @@ addThing = function(thing, x, y)
 				if item isa Item and thing.canStackWith(item) then
 					// just add to the existing item stack!
 					item.qty += 1
+					item.noteQtyChanged
 					return
 				end if
 			end for

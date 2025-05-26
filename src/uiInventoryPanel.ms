@@ -2,11 +2,14 @@
 // to use/equip/drop stuff, etc.
 
 import "importUtil"
+ensureImport "miscUtil"
 
 width = 300
 rowHeight = 18
 
 RETURN = char(10)
+
+coinImg = miscUtil.base64ToImage("AAAAAAPgB/AN+Bv8G/wb/Bv8G/wb/A34B/AD4AAAAAA=")
 
 init = function
 	outer.boldFont = ui.smallPrinter.boldFont
@@ -36,7 +39,9 @@ draw = function(h, items, loadout, title, selItemIdx = -1)
 	headColor = "#CCCCCC"
 	y -= rowHeight*1.5
 	thinFont.printRight "Size", xSize, y+rowHeight, 1, headColor
-	boldFont.printRight "$", xValue, y+rowHeight, 1, headColor
+	
+//	boldFont.printRight "$", xValue, y+rowHeight, 1, headColor
+	gfx.drawImage coinImg, xValue - 16, y+rowHeight-4, -1, -1, 0, 0, -1, -1, "#FFCC33"
 
 	buttons = []
 	yButton = bottom + 24
@@ -66,7 +71,7 @@ draw = function(h, items, loadout, title, selItemIdx = -1)
 		loadout.drawSlotIconForItem item, xUse, y
 		item.drawIcon gfx, xIcon, y - 2
 		boldFont.print item.nameWithQty, xName, y, 1, textColor
-		boldFont.printRight item.totalSize, xSize, y, 1, textColor
+		boldFont.printRight round(item.totalSize, 1), xSize, y, 1, textColor
 		boldFont.printRight item.totalValue, xValue, y, 1, textColor
 		y -= rowHeight
 	end for

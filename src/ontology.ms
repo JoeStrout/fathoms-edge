@@ -153,13 +153,16 @@ Item.useBy = function(agent); end function
 Item.usedVerb = "used"
 Item.qty = 1        // how many are in this stack; or null if not stackable
 
+Item.noteQtyChanged = null  // (function called when quantity changes)
+
 Item.stackable = function; return self.qty != null; end function
 
 Item.canStackWith = function(other)
 	if not refEquals(self.__isa, other.__isa) then return false
 	if not self.stackable or not other.stackable then return false
 	for kv in self
-		if ["qty", "id", "pluralName"].indexOf(kv.key) != null then continue
+		if ["qty", "id", "pluralName", "_sprite", "x", "y"].
+		  indexOf(kv.key) != null then continue
 		if not other.hasIndex(kv.key) then return false
 		if @other[kv.key] != @kv.value then return false
 	end for

@@ -192,4 +192,22 @@ I've implemented item stacks.  Items will stack with identical items, as long as
 
 So I think that's all working, though it might be good to get some user testing to see if there are any item duplication or destruction exploits.
 
-Next on the to-do list is gold.  I'm inclined to treat gold as just an ordinary stackable item, with a value of 1 and a very low size (maybe 0.01).  Then we don't need so much special code; we can have gold on the map, in containers, or dropped by mobs, all for free.  We might want a bit of special code to keep gold sorted to the top of the inventory list.  Also, should we refer to it as "coins" rather than "gold"?  Hmm.
+Next on the to-do list is gold.  I'm inclined to treat gold as just an ordinary stackable item, with a value of 1 and a very low size (maybe 0.01).  Then we don't need so much special code; we can have gold on the map, in containers, or dropped by mobs, all for free.  We might want a bit of special code to keep gold sorted to the top of the inventory list.  Also, should we refer to it as "coins" rather than "gold"?  Hmm.  Claude says that most rougelikes use "gold", so that's what players are used to seeing.  I should probably stick with that.
+
+Playing around with gold/coin icons:
+AAAAAAPgB/AN+Bv8G/wb/Bv8G/wb/A34B/AD4AAAAAA= (single coin, standing up)
+AAAD4A/4H/wf/A/4E+QMGBPkDBgT5AwYE+QMGAfwAAA= (neat stack of 5 coins)
+A+AP+B/8H/wP+BPkDBgD5gYcCfIGDBn0DhgT5AwYA+A= (sloppy stack of 6 coins)
+AAAAAAAAAAAAAAAAAAAAAAAAA+AO+B38HfwO+APgAAA= (single coin, lying down)
+
+A fun idea is to have the graphic actually change to show the amount of coins, up to some limit.  Perhaps:
+
+AAAAAAAAAAAAAAAAAAAAAAAAA+AO+B38HfwO+APgAAA= (1 coin)
+AAAAAAAAAAAAAAAAAfAHfA7+Dv43fHHwdgA74A+AAAA= (2 coins)
+AAAAAAAAAAAAAAHwB3wO/i7+d3x58D4ED7wAOAPgAAA= (3 coins)
+AAAAAAAAA+AO+B38HfwO+BPkDBgT5AwYE+QMGAPgAAA= (4 coins)
+AAAD4A74Hfwd/A74E+QMGBPkDBgT5AwYE+QMGAPgAAA= (5+ coins)
+
+Implemented that.  Working like a charm!  I don't have any special sorting for it in the inventory list, but I'm going to wait on that until I have a stronger sense of how we want to sort that in general.  So I'm calling the "gold" feature done for now.
+
+
