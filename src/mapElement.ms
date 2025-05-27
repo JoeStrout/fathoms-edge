@@ -205,6 +205,11 @@ MapElement.drawPaletteEntry = function(x, y, g=null)
 	drawTileImage self.overlayTileId, self.overlayTileColor, x, y, g
 end function
 
+MapElement.bump = function(agent, x, y)
+	agent.note "You can't move that way."
+end function
+	
+
 // Load and return a list of MapElement objects from a .tsv (tab-separated
 // value) file.
 MapElement.LoadFromFile = function(path)
@@ -213,17 +218,36 @@ MapElement.LoadFromFile = function(path)
 	maxId = val(data[-1].id)
 	result = [null] * (maxId+1)
 	for d in data
+		// figure out what map element class to use
+		if d.class then
+			elemClass = outer[d.class]
+		else if d.basedOnId isa number then
+			elemClass = result[d.basedOnId].__isa
+		else
+			elemClass = MapElement
+		end if
 		// clear out empty columns
 		for k in d.indexes; if d[k] == "" then d.remove k; end for
-		// then create a MapElement out of it -- and possibly a previous one
+		// then create a MapElement out of it -- possibly based on a previous one
 		if d.hasIndex("basedOnId") then
 			result[d.id] = new MapElement + result[d.basedOnId] + d
+			result[d.id].__isa = elemClass // (since the + above could overwrite it)
 		else
-			result[d.id] = new MapElement + d
+			result[d.id] = new elemClass + d
 		end if
 	end for
 	return result
 end function
+
+// Sign: a MapElement subclass for signs.  These respond to bumping by
+// displaying the sign text.
+Sign = new MapElement
+
+Sign.bump = function(agent, x, y)
+	agent.note "If you were looking for a sign, here's one now."
+end function
+	
+
 
 test = function
 	globals.m = new MapElement

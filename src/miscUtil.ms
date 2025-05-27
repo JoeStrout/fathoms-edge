@@ -2,6 +2,7 @@
 
 import "importUtil"
 ensureImport "base64"
+ensureImport "styledText"	// (for bug fix below)
 
 // Roll against a % probability (0-100).
 // Return true on success, false on failure.
@@ -122,6 +123,25 @@ string.plural = function
 		return s + "s"  // car -> cars
 	end if
 end function
+
+// Fix for bug in /sys/lib/styledText (in Mini Micro 1.6.2 and earlier):
+styledText.BmfPrinter.calcHeight = function(markup, x, wrapAt=null, wrapTo=null)
+	if wrapAt == null then wrapAt = self.wrapAt
+	if wrapTo == null then wrapTo = x
+	y = 0
+	top = y - self.font.sizeOver
+	for styleRun in styledText.parseMarkup(markup)
+		while wrapAt - x < self.font.width(styleRun.text)
+			partialText = self.cutToFit(styleRun, wrapAt - x, x <= wrapTo)
+			x = wrapTo
+			y = y - self.font.lineHeight
+		end while
+		x = self.printOneRun(styleRun, styleRun.text, x, y, true)
+	end for
+	bottom = y - self.font.sizeUnder
+	return top - bottom
+end function
+
 
 if locals == globals then
 	img = file.loadImage("/usr/pics/shroom.png")

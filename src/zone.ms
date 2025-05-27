@@ -196,3 +196,14 @@ passable = function(x, y, byAgent)
 	end for
 	return true
 end function
+
+// Deal with an agent attempting to interact with a location (usually,
+// by bumping into it as if trying to move).
+interact = function(x, y, byAgent)
+	if not inBounds(x, y) then
+		byAgent.note "You can't move that way."
+	else
+		elem = mapElems[x][y]
+		elem.bump byAgent, x, y
+	end if	
+end function

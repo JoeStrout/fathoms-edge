@@ -196,14 +196,13 @@ drawRightPanel = function
 	y -= dy; font.print keyCap("K") + " - Attack", x, y, 1, c
 	y -= dy; font.print keyCap("C") + " - Cast", x, y, 1, c
 	
-	
-
-	
-	y = 10
+	y = 10 - font.lineHeight
 	for i in range(log.len - 1, 0, -1)
 		entry = log[i]
-		if entry[0] >= turn-1 then c = "#CCFFCC" else c = "#888888"
-		font.print "[{0}] {1}".fill(entry), x, y, 1, c
+		if entry[0] >= turn-1 then gfx.color = "#CCFFCC" else gfx.color = "#888888"
+		msg = "[{0}] {1}".fill(entry)
+		dy = smallPrinter.calcHeight(msg, x, 960, x)
+		smallPrinter.print msg, x, y + dy, 960, x
 		y += dy
 	end for
 	

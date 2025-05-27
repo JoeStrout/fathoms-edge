@@ -252,9 +252,9 @@ end function
 // success, false if we weren't able to move.
 Agent.attemptMove = function(dx, dy)
 	if self.container then return false	// can't move while in container
-	if not zone.passable(self.x + dx, self.y + dy) then
-		// Bonk!
-		self.note "You can't move that way."
+	if not zone.passable(self.x + dx, self.y + dy, self) then
+		// Not passable — bump!  Interact with whatever's in that space.
+		zone.interact self.x + dx, self.y + dy, self
 		return false
 	end if
 	stuff = zone.getItems(self.x + dx, self.y + dy)
