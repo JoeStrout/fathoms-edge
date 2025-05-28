@@ -142,6 +142,28 @@ styledText.BmfPrinter.calcHeight = function(markup, x, wrapAt=null, wrapTo=null)
 	return top - bottom
 end function
 
+// And, an improved printStyleRuns method that supports line breaks!
+styledText.BmfPrinter.printStyleRuns = function(runs)
+	for styleRun in runs
+		hardlines = styleRun.text.split(char(10))
+		for i in hardlines.indexes
+			styleLine = new styleRun
+			styleLine.text = hardlines[i]
+			while self.wrapAt - self.x < self.font.width(styleLine.text)
+				partialText = self.cutToFit(styleLine, self.wrapAt - self.x, self.x <= self.wrapTo)
+				self.printOneRun styleRun, partialText, self.x, self.y
+				self.x = self.wrapTo
+				self.y -= self.font.lineHeight
+			end while
+			self.x = self.printOneRun(styleRun, styleLine.text, self.x, self.y)
+			self.y -= self.font.lineHeight
+			if i < hardlines.len-1 then self.x = self.wrapTo
+		end for
+	end for
+	self.x = self.wrapTo
+	self.y -= self.font.lineHeight
+end function
+
 
 if locals == globals then
 	img = file.loadImage("/usr/pics/shroom.png")

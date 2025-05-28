@@ -239,15 +239,6 @@ MapElement.LoadFromFile = function(path)
 	return result
 end function
 
-// Sign: a MapElement subclass for signs.  These respond to bumping by
-// displaying the sign text.
-Sign = new MapElement
-
-Sign.bump = function(agent, x, y)
-	agent.note "If you were looking for a sign, here's one now."
-end function
-	
-
 
 test = function
 	globals.m = new MapElement

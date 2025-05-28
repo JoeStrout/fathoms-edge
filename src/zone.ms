@@ -202,6 +202,10 @@ end function
 interact = function(x, y, byAgent)
 	if not inBounds(x, y) then
 		byAgent.note "You can't move that way."
+	else if things[x][y] then
+		for thing in things[x][y]
+			thing.interact byAgent
+		end for
 	else
 		elem = mapElems[x][y]
 		elem.bump byAgent, x, y

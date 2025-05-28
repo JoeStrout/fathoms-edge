@@ -34,6 +34,9 @@ tempG = new PixelDisplay
 
 log = []  // list of [turn number, message] pairs
 
+logGfx = new PixelDisplay
+logGfxDirty = true
+
 keyCap = function(asciiChar)
 	return char(asciiChar.code + keyCapCode)
 end function
@@ -62,10 +65,8 @@ _printToImage = function(styleRuns, bgColor="#000000", width=300, printer=null)
 	printer.x = printer.wrapTo
 	printer.y = tempG.height - printer.font.lineHeight
 	oldGfx = gfx; globals.gfx = tempG
-	print "start y: " + printer.y
 	printer.printStyleRuns styleRuns
 	globals.gfx = oldGfx
-	print "end y: " + printer.y
 	return tempG.getImage(0, printer.y, tempG.width, tempG.height - printer.y)
 end function
 
@@ -196,20 +197,27 @@ drawRightPanel = function
 	y -= dy; font.print keyCap("K") + " - Attack", x, y, 1, c
 	y -= dy; font.print keyCap("C") + " - Cast", x, y, 1, c
 	
-	y = 10 - font.lineHeight
-	for i in range(log.len - 1, 0, -1)
-		entry = log[i]
-		if entry[0] >= turn-1 then gfx.color = "#CCFFCC" else gfx.color = "#888888"
-		msg = "[{0}] {1}".fill(entry)
-		dy = smallPrinter.calcHeight(msg, x, 960, x)
-		smallPrinter.print msg, x, y + dy, 960, x
-		y += dy
-	end for
-	
+	if logGfxDirty then
+		oldGfx = gfx
+		globals.gfx = logGfx
+		gfx.clear "#222222", w-8, 200
+		y = 4 - font.lineHeight
+		for i in range(log.len - 1, 0, -1)
+			entry = log[i]
+			if entry[0] >= turn-1 then gfx.color = "#CCFFCC" else gfx.color = "#888888"
+			msg = "[{0}] {1}".fill(entry)
+			dy = smallPrinter.calcHeight(msg, 0, logGfx.width, 0)
+			smallPrinter.print msg, 0, y + dy, logGfx.width, 0
+			y += dy
+		end for
+		globals.gfx = oldGfx
+		outer.logGfxDirty = false
+	end if
+	gfx.drawImage logGfx.getImage, left+4, 4
 	
 end function
 
-showAlert = function(message)
+showAlert = function(message, title="")
 	runs = styledText.parseMarkup(message)
 	gfx.color  = textColor
 	img = _printToImage(runs)
@@ -243,6 +251,7 @@ end function
 addLogMessage = function(msg)
 	log.push [turn, msg]
 	if log.len > 10 then log.pull
+	outer.logGfxDirty = true
 end function
 
 showInventory = function(container, title="Inventory")

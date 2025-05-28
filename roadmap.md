@@ -11,7 +11,7 @@ You Can...
 ## 0.2
 - ☑︎ Stack identical items in your inventory
 - ☑︎ Find and accumulate gold
-- ☐ Interact with objects like signs
+- ☑︎ Interact with objects like signs
 - ☐ Interact with containers (adding/removing items)
 
 ## 0.3

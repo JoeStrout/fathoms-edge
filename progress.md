@@ -211,3 +211,13 @@ AAAD4A74Hfwd/A74E+QMGBPkDBgT5AwYE+QMGAPgAAA= (5+ coins)
 Implemented that.  Working like a charm!  I don't have any special sorting for it in the inventory list, but I'm going to wait on that until I have a stronger sense of how we want to sort that in general.  So I'm calling the "gold" feature done for now.
 
 
+5/27/25
+=======
+Working on support for signs, which should show their sign text when you bump into them.  I'm currently approaching this by adding a `class` column to mapElements.tsv, which lets you specify some MapElement subclass to use for certain palette entries.  And that lets us overwrite a standard `bump` method with a custom one.
+
+Trouble is, that's not really good enough for signs... because each sign generally needs unique text.  And this custom object is just a palette entry; it's the same everywhere that line appears.  Where do we get the custom data?
+
+Maybe a sign should be a Thing instead of a custom map element.  But it'd still be nice to be able to place that via the map editor.  Perhaps the class column should indicate, not a custom MapElement subclass, but a Thing subclass to instantiate at that spot.  Or, maybe I'm not thinking big-picture enough.  Ultimately we'll want to place things on the map independent of the tile type.  The map editor should have such a facility, but that's a bigger item — probably for v0.6.  So for now, I can just place the signs in code, as I do all other items and mobs now.
+
+So, I've now re-implemented signs as Obstacles (a type of Thing), placed in town.ms, and it seems to be working fine.  I've deleted the Sign subclass of MapElement, and the two sign lines in the palette, but for now left the MapElement subclassing code in place.  Maybe it will be useful in other situations.
+

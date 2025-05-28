@@ -19,6 +19,9 @@ load = function
 	bone.size = 2
 	bone.placeOnMap 8, 3
 	
+	Sign.Make("Welcome to Fathom's Edge").placeOnMap 20, 20
+	Sign.Make("East: Fathom's Edge; South: Fathom", 224).placeOnMap 16, 7
+	
 	for i in [0,1,2,4,5]
 		globals.apple = Food.Make("apple", 943)
 		apple.color = "#FF4444"

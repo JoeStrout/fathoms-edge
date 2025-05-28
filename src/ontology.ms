@@ -135,6 +135,8 @@ Thing.drawIcon = function(gfx, x, y)
 	gfx.drawImage img, x, y, -1, -1, 0, 0, -1, -1, self.color
 end function
 
+Thing.interact = function(agent)
+end function
 
 // Obstacle: things that go on the map, generally don't move around,
 // and block movement by the player and mobs.
@@ -142,6 +144,25 @@ globals.Obstacle = new Thing
 Obstacle.iconIdx = 210
 Obstacle.blocksMovement = true
 
+
+// Sign: an obstacle with text on it.
+globals.Sign = new Obstacle
+Sign.iconIdx = 225  // also consider 224, directional sign
+Sign.color = "#CCCCCC"
+Sign.text = "If you were looking for a sign, here's one now!"
+Sign.interact = function(agent)
+	agent.note "Sign: " + self.text
+	if agent == player then
+		ui.showAlert "The sign says:" + char(10)*2 + "*" + self.text + "*"
+	end if
+end function
+
+Sign.Make = function(text = null, iconIdx = null)
+	noob = new self
+	if text != null then noob.text = text
+	if iconIdx != null then noob.iconIdx = iconIdx
+	return noob
+end function
 
 // Item: inanimate objects that agents can (usually) pick up, or
 // a stack of identical items.
