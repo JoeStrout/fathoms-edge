@@ -35,3 +35,78 @@ end function
 Gold.noteQtyChanged = function
 	if self._sprite != null then self._sprite.image = self.image
 end function
+
+
+globals.Bone = new Item
+Bone.Make = function
+	bone = super.Make("bone", 784)
+	bone.color = "#CCCCCC"
+	bone.size = 2
+	return bone
+end function
+
+globals.Chest = new Container
+Chest.Make = function
+	chest = Container.Make("chest")
+	chest.color = "#CC9933"
+	return chest
+end function
+
+globals.Ring = new Equipment
+Ring.Make = function(name="ring", iconIdx=910, value=75)
+	item = super.Make(name, iconIdx, loadout.RING)
+	item.color = color.silver
+	item.value = value
+	return item
+end function
+
+globals.DiamondRing = new Ring
+DiamondRing.Make = function
+	return new Ring.Make("diamond ring", 910, 75)
+end function
+
+globals.RingOfProtection = new Ring
+RingOfProtection.Make = function
+	ring = super.Make("Ring of Protection", 907)
+	ring.value = 325
+	ring.resistance.fire = 10
+	ring.resistance.cold = 10
+	ring.resistance.shock = 5
+	return ring
+end function
+
+
+globals.Amulet = new Equipment
+Amulet.Make = function(name="amulet", iconIdx=940, value=120)
+	item = super.Make(name, iconIdx, loadout.NECK)
+	item.color = "#FFCC33"
+	item.value = value
+	return item
+end function
+
+globals.Apple = new Food
+Apple.Make = function
+	item = super.Make("apple", 943)
+	item.color = "#FF3333"
+	item.value = 2
+	return item
+end function
+
+globals.Bread = new Food
+Bread.Make = function
+	item = Food.Make("bread", 911)
+	item.color = "#CCCC33"
+	item.size = 2
+	return item
+end function
+
+globals.Buckler = new Equipment
+Buckler.Make = function
+	item = Equipment.Make("buckler", 809, loadout.OFFHAND)
+	item.color = "#CC9966"
+	item.resistance.physical = 5
+	item.size = 3
+	return item
+end function
+
+

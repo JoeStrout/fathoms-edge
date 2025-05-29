@@ -226,4 +226,7 @@ So, I've now re-implemented signs as Obstacles (a type of Thing), placed in town
 =======
 I think I've got containers implemented.  The item list for both player inventory and containers is limited to 10 rows or so, beyond which Bad Things will happen; but I can fix that in version 0.5, which I'm thinking of as the "polish" release.
 
+Before I call it quits, I'm going to move the various object definitions I've currently got scattered around main.ms and town.ms into commonItems.ms.  I suppose to satisfy GitHub's silly "popularity" measure, I should really make a separate file for each item, but as most of them are only 3 or 4 lines long, I just can't bring myself to do that yet.
+
+I'll make a commonMobs.ms file too.  These two files together will provide a common library of items & monsters for adventure creators to either use as-is, or to calibrate their own creations against.
 
