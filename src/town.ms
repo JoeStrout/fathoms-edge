@@ -23,23 +23,23 @@ load = function
 	chest.color = "#CC9933"
 	chest.placeOnMap 15, 8
 
-	item = Equipment.Make("Diamond Ring", 910, loadout.RING)
+	item = Equipment.Make("diamond ring", 910, loadout.RING)
 	item.color = color.silver
 	item.value = 75
 	chest.contain item
 	
-	item = Equipment.Make("Amulet", 940, loadout.NECK)
+	item = Equipment.Make("amulet", 940, loadout.NECK)
 	item.color = "#FFCC33"
 	item.value = 120
 	item.resistance.shock = 5
 	chest.contain item
 	
-	item = Food.Make("Bread", 911)
+	item = Food.Make("bread", 911)
 	item.color = color.yellow
 	item.size = 2
 	chest.contain item
 	
-	item = Equipment.Make("Buckler", 809, loadout.OFFHAND)
+	item = Equipment.Make("buckler", 809, loadout.OFFHAND)
 	item.color = color.brown
 	item.resistance.physical = 5
 	item.size = 3
@@ -49,17 +49,17 @@ load = function
 	Sign.Make("Welcome to Fathom's Edge").placeOnMap 20, 20
 	Sign.Make("East: Fathom's Edge; South: Fathom", 224).placeOnMap 16, 7
 	
-	for i in [0,1,2,4,5]
+	for i in [1,2]
 		globals.apple = Food.Make("apple", 943)
 		apple.color = "#FF4444"
 		apple.value = 2
-		if i == 5 then apple.qty = 5
+		apple.qty = i
 		apple.placeOnMap 10+i, 12
 	end for
 	
-	for i in range(0,4)
-		gold = Gold.Make(i+1)
-		gold.placeOnMap 10+i, 8
+	for i in range(1,3)
+		gold = Gold.Make(i)
+		gold.placeOnMap 10+i, 8-i
 	end for
 	
 	Shroom = Food.Make("shroom", file.loadImage("/usr/pics/shroom.png"))
@@ -115,7 +115,7 @@ load = function
 	Rat.health = 5
 	Rat.leavesCorpse = true
 	Rat.attacksPerTurn = 2
-	for i in [] //range(2)
+	for i in range(1)
 		rat = Rat.Make
 		rat.placeOnMap floor(40*rnd), floor(30*rnd)
 	end for	
@@ -126,7 +126,7 @@ load = function
 	Slime.health = 10
 	Slime.attacksPerTurn = 0.5
 	Slime.damage.physical = 3
-	for i in [] // range(2)
+	for i in range(1)
 		slime = Slime.Make
 		if rnd < 0.5 then slime.contain new Ring
 		slime.placeOnMap floor(40*rnd), floor(30*rnd)

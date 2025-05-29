@@ -153,6 +153,10 @@ Inventory.remove = function(bogusParam)
 	qa.abort "Somebody called `remove` on an Inventory object instead of `removeItem`."
 end function
 
+Inventory.contains = function(item)
+	return self.items.containsRef(item)
+end function
+
 
 runUnitTests = function
 	ensureImport "ontology"

@@ -221,3 +221,9 @@ Maybe a sign should be a Thing instead of a custom map element.  But it'd still 
 
 So, I've now re-implemented signs as Obstacles (a type of Thing), placed in town.ms, and it seems to be working fine.  I've deleted the Sign subclass of MapElement, and the two sign lines in the palette, but for now left the MapElement subclassing code in place.  Maybe it will be useful in other situations.
 
+
+5/29/25
+=======
+I think I've got containers implemented.  The item list for both player inventory and containers is limited to 10 rows or so, beyond which Bad Things will happen; but I can fix that in version 0.5, which I'm thinking of as the "polish" release.
+
+

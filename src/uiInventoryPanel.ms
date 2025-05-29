@@ -34,6 +34,7 @@ draw = function(items, loadout, title, selItemIdx = -1, toLeft=null)
 	xValue = left + width - 12 // (right point)
 
 	bottom = 320 - h/2
+	globals.gfx = disp.dialog
 	gfx.fillRect left, bottom, width, h, "#000000"
 	gfx.drawRect left+3, bottom+3, width-6, h-6, "#FFFFFF", 5
 	y = bottom + h - 20
@@ -74,7 +75,14 @@ draw = function(items, loadout, title, selItemIdx = -1, toLeft=null)
 			else if item.usable then
 				btn = Button.Make("Use", left + width - 100, yButton, ["u", RETURN])
 				btn.item = item
-				btn.action = function; use self.item; end function
+				if toLeft == false then // i.e., is in container
+					btn.action = function
+						takeFromContainer self.item
+						use self.item
+					end function
+				else
+					btn.action = function; use self.item; end function
+				end if
 				buttons.push btn
 			end if
 			if toLeft == true then
@@ -98,6 +106,7 @@ draw = function(items, loadout, title, selItemIdx = -1, toLeft=null)
 		boldFont.printRight item.totalValue, xValue, y, 1, textColor
 		y -= rowHeight
 	end for
+	globals.gfx = disp.gfx
 	return buttons
 end function
 
@@ -107,7 +116,7 @@ erase = function(toLeft=null)
 	if toLeft == true then left -= width/2 + 4
 	if toLeft == false then left += width/2 + 4
 	bottom = 320 - h/2
-	gfx.fillRect left, bottom, width, h, color.clear
+	disp.dialog.fillRect left, bottom, width, h, color.clear
 end function
 
 
@@ -138,6 +147,7 @@ show = function(agent, container)
 			for btn in btns; btn.draw; end for
 			outer.refresh = false
 		end if
+		yield
 		if key.available then
 			if selPanel then itemQty = containerItems.len else itemQty = items.len
 			k = key.get
@@ -162,7 +172,6 @@ show = function(agent, container)
 			outer.refresh = true
 		end if
 		for btn in btns; btn.update; end for			
-		yield
 	end while
 	
 	if container == null then
@@ -217,13 +226,12 @@ putInContainer = function(item)
 	agent.loadout.unequip item
 	wholeStack = key.shiftPressed
 	if item.qty == null or item.qty <= 1 then wholeStack = true
-	if wholeStack then
-		container.contain item
-		itemName = item.nameWithArticle
-	else
-		print "Not implemented yet."
+	if not wholeStack then
+		item = agent.contents.removeItem(item, 1)
 	end if
+	container.contain item
 	outer.refresh = true
+	itemName = item.nameWithArticle
 	containerName = container.nameWithArticle("the")
 	agent.note "Placed {itemName} in {containerName}.".fill(locals)
 	agent.update
@@ -233,13 +241,12 @@ end function
 takeFromContainer = function(item)
 	wholeStack = key.shiftPressed
 	if item.qty == null or item.qty <= 1 then wholeStack = true
-	if wholeStack then
-		agent.contain item
-		itemName = item.nameWithArticle
-	else
-		print "Not implemented yet."
+	if not wholeStack then
+		item = container.contents.removeItem(item, 1)
 	end if
+	agent.contain item
 	outer.refresh = true
+	itemName = item.nameWithArticle
 	containerName = container.nameWithArticle("the")
 	agent.note "Took {itemName} from {containerName}.".fill(locals)
 	agent.update

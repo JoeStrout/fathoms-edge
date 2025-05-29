@@ -1,11 +1,13 @@
 // Module to manage the display system.
 //
-//	7. background tiles
-//	6. main tiles (obstacles etc.)
-//	5. sprite
-//	4. overlay tiles
-//	3. gfx
-//	2. text
+//  7. background color tiles
+//	6. background tiles
+//	5. main tiles (obstacles etc.)
+//	4. sprite (player, mobs, things on the map)
+//	3. overlay tiles
+//	2. gfx (constant game UI layer)
+//	1. dialogs (temporary, blocking UI layer)
+//	0. text (only used for debugging)
 
 import "importUtil"
 ensureImport "oneBit"
@@ -36,8 +38,12 @@ init = function
 	globals.gfx = gfx
 	gfx.clear
 	
-	display(1).mode = displayMode.text
-	outer.text = display(1)
+	display(1).mode = displayMode.pixel
+	outer.dialog = display(1)
+	dialog.clear
+	
+	display(0).mode = displayMode.text
+	outer.text = display(0)
 	globals.text = text
 	text.clear
 	

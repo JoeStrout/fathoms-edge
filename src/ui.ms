@@ -108,10 +108,12 @@ Button.draw = function(hovered=false, pressed=false)
 	else
 		if hovered then c = self.hoverColor else c = self.normalColor
 	end if
-	button9Slice.draw gfx, self.x - self.width/2, self.y - self.height/2,
+	button9Slice.draw disp.dialog, self.x - self.width/2, self.y - self.height/2,
 	  self.width, self.height, c
 	f = smallPrinter.boldFont
+	globals.gfx = disp.dialog
 	f.printCentered self.caption, self.x, self.y - f.lineHeight/2 + 3, 1, self.textColor
+	globals.gfx = disp.gfx
 	self.wasPressed = pressed
 	self.wasHovered = hovered
 end function
@@ -154,6 +156,7 @@ drawRightPanel = function
 	left = 960 - w
 	midx = left + w/2
 	bottom = 0
+	globals.gfx = disp.gfx
 	gfx.fillRect left, bottom, w, h, "#222222"
 	gfx.drawRect left, bottom, w, h, "#CCCCCC"
 	gfx.color = "#CCCCCC"
@@ -219,23 +222,24 @@ end function
 
 showAlert = function(message, title="")
 	runs = styledText.parseMarkup(message)
-	gfx.color  = textColor
+	g = disp.dialog
+	g.color  = textColor
 	img = _printToImage(runs)
 	for scale in range(0.1, 0.9, 0.1)
 		w = img.width * scale
 		h = (img.height + 40) * scale
 		x = 480 - w/2
 		y = 320 - h/2
-		gfx.drawImage img, x, y, w, h
+		g.drawImage img, x, y, w, h
 		yield
 	end for
 	w = img.width
 	h = img.height + 40
 	x = 480 - w/2
 	y = 320 - h/2
-	gfx.fillRect x-8, y-8, w+16, h+16, "#000000"
-	gfx.drawImage img, x, y + 40
-	gfx.drawRect x-5, y-5, w+10, h+10, "#FFFFFF", 5		
+	g.fillRect x-8, y-8, w+16, h+16, "#000000"
+	g.drawImage img, x, y + 40
+	g.drawRect x-5, y-5, w+10, h+10, "#FFFFFF", 5		
 	btn = Button.Make("OK", 480, y + 16, [" ", char(27), char(13), char(10)])
 	btn.draw
 	done = false
@@ -245,7 +249,7 @@ showAlert = function(message, title="")
 		btn.update
 		if key.available then btn.handleKey(key.get)
 	end while
-	gfx.fillRect x-8, y-8, w+16, h+16, color.clear
+	g.fillRect x-8, y-8, w+16, h+16, color.clear
 end function
 
 addLogMessage = function(msg)
