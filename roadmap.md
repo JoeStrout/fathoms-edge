@@ -13,27 +13,29 @@ You Can...
 - ☑︎ Find and accumulate gold
 - ☑︎ Interact with objects like signs
 - ☐ Interact with containers (adding/removing items)
+- ☐ Interact with NPCs (basic conversation)
 
 ## 0.3
-- ☐ Interact with NPCs (basic conversation)
 - ☐ See info about items on the map by mousing over them
 - ☐ Buy/sell items from NPCs
 - ☐ Ask NPCs about arbitrary topics
-
-## 0.4
 - ☐ Transfer between zones via doors/portals
 - ☐︎ Visit specialized shops in town: smith, alchemist, librarian, grocer
+
+## 0.4
 - ☐ Create a new character with name, stats, & starting class/gear
 - ☐ Save and load a character/game from the startup menu
 - ☐ Toggle hide/sneak mode by pressing H
 - ☐ Visit a room that can be reached only by sneaking
-
-## 0.5
 - ☐ Accumulate XP and level up
 - ☐ For testing purposes, create archetype characters of various class/level
+
+## 0.5
 - ☐ Fight rats etc. in the town sewers (unleveled dungeon)
 - ☐ Make use of magic scrolls
 - ☐ Learn and cast basic spells
+- ☐ Scroll through long item lists in inventory/containers
+- ☐ Hear appropriate sound effects for combat, item interaction, etc.
 
 ## 0.6
 - ☐ Learn and use at least 10 different spells

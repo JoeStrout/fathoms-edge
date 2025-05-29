@@ -16,6 +16,7 @@ setup = function
 	sword.color = color.silver
 	sword.damage.physical = 3
 	sword.size = 2
+	sword.value = 45
 	player.contain sword
 	player.loadout.equip sword
 	
@@ -23,12 +24,14 @@ setup = function
 	wand.color = "#CCCCFF"
 	wand.attackRange = 10
 	wand.damage.cold = 2
+	wand.value = 215
 	player.contain wand
 	
 	armor = Equipment.Make("leather armor", 736, loadout.BODY)
 	armor.color = color.brown
 	armor.resistance.physical = 10
-	armor.size = 3
+	armor.size = 5
+	armor.value = 24
 	player.contain armor
 	player.loadout.equip armor
 	

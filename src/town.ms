@@ -19,6 +19,33 @@ load = function
 	bone.size = 2
 	bone.placeOnMap 8, 3
 	
+	chest = Container.Make("chest")
+	chest.color = "#CC9933"
+	chest.placeOnMap 15, 8
+
+	item = Equipment.Make("Diamond Ring", 910, loadout.RING)
+	item.color = color.silver
+	item.value = 75
+	chest.contain item
+	
+	item = Equipment.Make("Amulet", 940, loadout.NECK)
+	item.color = "#FFCC33"
+	item.value = 120
+	item.resistance.shock = 5
+	chest.contain item
+	
+	item = Food.Make("Bread", 911)
+	item.color = color.yellow
+	item.size = 2
+	chest.contain item
+	
+	item = Equipment.Make("Buckler", 809, loadout.OFFHAND)
+	item.color = color.brown
+	item.resistance.physical = 5
+	item.size = 3
+	chest.contain item
+	
+	
 	Sign.Make("Welcome to Fathom's Edge").placeOnMap 20, 20
 	Sign.Make("East: Fathom's Edge; South: Fathom", 224).placeOnMap 16, 7
 	

@@ -145,11 +145,27 @@ Obstacle.iconIdx = 210
 Obstacle.blocksMovement = true
 
 
+// Container: an unmovable container like a chest.
+globals.Container = new Obstacle
+Container.name = "Container"
+Container.iconIdx = 200
+
+Container.Make = function(name, iconIdx=null, capacity=100)
+	return super.Make(name, iconIdx, capacity)
+end function
+
+Container.interact = function(agent)
+	ui.showContainerUI agent, self
+end function
+
+
+
 // Sign: an obstacle with text on it.
 globals.Sign = new Obstacle
 Sign.iconIdx = 225  // also consider 224, directional sign
 Sign.color = "#CCCCCC"
 Sign.text = "If you were looking for a sign, here's one now!"
+
 Sign.interact = function(agent)
 	agent.note "Sign: " + self.text
 	if agent == player then

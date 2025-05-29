@@ -71,10 +71,10 @@ _printToImage = function(styleRuns, bgColor="#000000", width=300, printer=null)
 end function
 
 Button = {}
-Button.normalColor = "#88CC88"
+Button.normalColor = "#339933"
 Button.hoverColor = "#AAFFAA"
 Button.pressedColor = "#44AA44"
-Button.textColor = "#000000"
+Button.textColor = "#99FF99"
 Button.x = 480
 Button.y = 320
 Button.width = 80
@@ -111,7 +111,7 @@ Button.draw = function(hovered=false, pressed=false)
 	button9Slice.draw gfx, self.x - self.width/2, self.y - self.height/2,
 	  self.width, self.height, c
 	f = smallPrinter.boldFont
-	f.printCentered self.caption, self.x, self.y - f.lineHeight/2 + 2, 1, self.textColor
+	f.printCentered self.caption, self.x, self.y - f.lineHeight/2 + 3, 1, self.textColor
 	self.wasPressed = pressed
 	self.wasHovered = hovered
 end function
@@ -254,8 +254,12 @@ addLogMessage = function(msg)
 	outer.logGfxDirty = true
 end function
 
-showInventory = function(container, title="Inventory")
-	uiInventoryPanel.show container, title
+showInventory = function(agent)
+	uiInventoryPanel.show agent
+end function
+
+showContainerUI = function(agent, container)
+	uiInventoryPanel.show agent, container
 end function
 
 update = function
