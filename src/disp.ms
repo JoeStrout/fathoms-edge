@@ -9,6 +9,7 @@
 //	1. dialogs (temporary, blocking UI layer)
 //	0. text (only used for debugging)
 
+clear
 import "importUtil"
 ensureImport "oneBit"
 
@@ -45,6 +46,8 @@ init = function
 	display(0).mode = displayMode.text
 	outer.text = display(0)
 	globals.text = text
+	text.backColor = color.clear
+	text.color = color.orange
 	text.clear
 	
 	for d in [background, main, overlay, sprite, gfx]

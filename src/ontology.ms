@@ -521,6 +521,22 @@ end function
 // complex behavior than generic CombatAgents.
 globals.Character = new CombatAgent
 
+// NPC: non-player characters.  They can offer dialog, trade items, etc.
+globals.NPC = new Character
+NPC.conversation = null  // a simple string, OR a Conversation object
+
+NPC.Make = function(name=null, iconIdxOrImage=null, color=null)
+	if iconIdxOrImage isa number and iconIdxOrImage > 0 then
+		// To support combat animations, NPCs always need a sprite.
+		// ToDo: refactor this into CombatAgent?
+		iconIdxOrImage = oneBit.getTileImage(iconIdxOrImage)
+	end if
+	noob = super.Make(name, iconIdxOrImage, 100)
+	if color then noob.color = color
+	return noob
+end function
+
+
 // Class representing the player.
 globals.Player = new Character
 Player.name = "Player"
@@ -573,7 +589,3 @@ Player.handleCommand = function(cmd)
 	end if
 	return super.handleCommand(cmd)
 end function
-
-// Characters other than the player (but able to do most of the things the
-// player could do).
-globals.NPC = new Character

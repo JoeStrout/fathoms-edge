@@ -90,6 +90,9 @@ load = function
 		slime.placeOnMap floor(40*rnd), floor(30*rnd)
 	end for
 	
+	Alyce = TownsFolk.Make("Alyce", 127, "#FF9999")
+	Alyce.placeOnMap 9, 11
+	
 	player.placeOnMap 15, 10
 end function
 

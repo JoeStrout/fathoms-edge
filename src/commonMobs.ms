@@ -23,3 +23,14 @@ Slime.Make = function
 	return slime
 end function
 
+globals.TownsFolk = new NPC
+TownsFolk.color = "#FFFFCC"
+TownsFolk.Make = function(name, icon=null, color=null)
+	if icon == null then icon = 59 // consider 126 for boy and 127 for girl!
+	noob = super.Make(name, icon, color)
+	noob.disposition = Mob.FRIENDLY
+	noob.health = 100
+	return noob
+end function
+	
+	

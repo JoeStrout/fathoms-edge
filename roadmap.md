@@ -12,7 +12,7 @@ You Can...
 - ☑︎ Stack identical items in your inventory
 - ☑︎ Find and accumulate gold
 - ☑︎ Interact with objects like signs
-- ☐ Interact with containers (adding/removing items)
+- ☑︎ Interact with containers (adding/removing items)
 - ☐ Interact with NPCs (basic conversation)
 
 ## 0.3

@@ -230,3 +230,19 @@ Before I call it quits, I'm going to move the various object definitions I've cu
 
 I'll make a commonMobs.ms file too.  These two files together will provide a common library of items & monsters for adventure creators to either use as-is, or to calibrate their own creations against.
 
+
+5/31/25
+=======
+The last feature for 0.2 is "basic NPC conversation."  I'm picturing this: an NPC with something to say that you haven't already heard gets a little speech bubble over their head, with one of these icons:
+
+- question mark: needs help (probably offering a quest)
+- exclamation point: has reward for you (often after completing a quest)
+- X: canceling a quest because it has failed
+- happy face: has some happy comment to make
+- heart: wants to tell you how much they love something/someone
+- skull: is mourning the death of someone
+
+If there is no speech balloon, then this means you've already heard what the NPC has to say (or they have nothing unique to say).  When you interact with an NPC, it will display their icon, enlarged, along with their message.  In some cases, all you can do at that point is click OK (or press Return) to exit the dialog.  In other cases, there may be several possible responses for you to choose from.
+
+
+
