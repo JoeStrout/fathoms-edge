@@ -156,8 +156,10 @@ styledText.BmfPrinter.printStyleRuns = function(runs)
 				self.y -= self.font.lineHeight
 			end while
 			self.x = self.printOneRun(styleRun, styleLine.text, self.x, self.y)
-			self.y -= self.font.lineHeight
-			if i < hardlines.len-1 then self.x = self.wrapTo
+			if i < hardlines.len-1 then
+				self.x = self.wrapTo
+				self.y -= self.font.lineHeight
+			end if
 		end for
 	end for
 	self.x = self.wrapTo

@@ -16,6 +16,13 @@ smallPrinter.italicFont = bmfFonts.Font.load("/sys/fonts/NotoSansItalic-14.bmf")
 smallPrinter.boldFont = bmfFonts.Font.load("/sys/fonts/NotoSansBold-14.bmf")
 smallPrinter.boldItalicFont = bmfFonts.Font.load("/sys/fonts/NotoSansBoldItalic-14.bmf")
 
+bigPrinter = new styledText.BmfPrinter
+bigPrinter.font = bmfFonts.Font.load("/sys/fonts/NotoSans-24.bmf")
+bigPrinter.italicFont = bmfFonts.Font.load("/sys/fonts/NotoSansItalic-24.bmf")
+bigPrinter.boldFont = bmfFonts.Font.load("/sys/fonts/NotoSansBold-24.bmf")
+bigPrinter.boldItalicFont = bmfFonts.Font.load("/sys/fonts/NotoSansBoldItalic-24.bmf")
+
+
 button9Slice = Image9Slice.make(file.loadImage("/usr/pics/button.png"))
 
 keyCapCode = 57344 // plus the ASCII value of the character

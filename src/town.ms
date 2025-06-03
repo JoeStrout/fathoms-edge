@@ -5,6 +5,7 @@ ensureImport "disp"
 ensureImport "mapTools"
 ensureImport "zone"
 ensureImport "status"
+ensureImport "conversation"
 ensureImport "commonItems"
 ensureImport "commonMobs"
 
@@ -90,8 +91,19 @@ load = function
 		slime.placeOnMap floor(40*rnd), floor(30*rnd)
 	end for
 	
-	Alyce = TownsFolk.Make("Alyce", 127, "#FF9999")
-	Alyce.placeOnMap 9, 11
+	globals.Alyce = TownsFolk.Make("Alyce", 127, "#FF9999")
+	Alyce.conversation = Conversation.Make(
+	   "I've lost my dog Fido.  Can you help me find him?",
+	   ConvIcon.GIVEQUEST)
+	r1 = Alyce.conversation.addResponse("Sure, I'd be happy to!")
+	r2 = Alyce.conversation.addResponse("Sorry, I'm busy.")
+	r1.next = ConvNode.Make("Oh thank you!  I really hope he's OK!")
+	Alyce.placeOnMap 10, 11
+	
+	globals.Balen = TownsFolk.Make("Balen", 95, "#CCCC00")
+	Balen.conversation = Conversation.Make("Nice day for fishin', ain't it?")
+	Balen.placeOnMap 16, 16
+
 	
 	player.placeOnMap 15, 10
 end function

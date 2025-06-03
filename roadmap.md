@@ -13,7 +13,7 @@ You Can...
 - ☑︎ Find and accumulate gold
 - ☑︎ Interact with objects like signs
 - ☑︎ Interact with containers (adding/removing items)
-- ☐ Interact with NPCs (basic conversation)
+- ☑︎ Interact with NPCs (basic conversation)
 
 ## 0.3
 - ☐ See info about items on the map by mousing over them

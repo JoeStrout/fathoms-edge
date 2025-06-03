@@ -128,6 +128,7 @@ addThing = function(thing, x, y)
 			disp.main.setCell x, y, thing.iconIdx
 			disp.main.setCellTint x, y, thing.color
 		end if
+		thing.decorate
 	end if
 	if thing isa Agent and not agents.contains(thing) then agents.push thing
 end function
@@ -141,6 +142,7 @@ removeThing = function(thing)
 		else if disp.main.cell(thing.x, thing.y) == thing.iconIdx then
 			disp.main.setCell thing.x, thing.y, null
 		end if
+		thing.removeDecorations
 	end if
 	if thing isa Agent then agents.removeRef thing
 end function
@@ -183,6 +185,7 @@ moveThing = function(thing, newX, newY)
 		disp.main.setCell newX, newY, thing.iconIdx
 		disp.main.setCellTint newX, newY, thing.color
 	end if
+	thing.decorate
 end function
 
 // Return whether the given x,y position can be passed by the given agent.

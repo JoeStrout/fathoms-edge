@@ -245,4 +245,14 @@ The last feature for 0.2 is "basic NPC conversation."  I'm picturing this: an NP
 If there is no speech balloon, then this means you've already heard what the NPC has to say (or they have nothing unique to say).  When you interact with an NPC, it will display their icon, enlarged, along with their message.  In some cases, all you can do at that point is click OK (or press Return) to exit the dialog.  In other cases, there may be several possible responses for you to choose from.
 
 
+6/01/25
+=======
+I need to make speech bubbles appear over the heads of NPCs with something to say.  Later, I might also need extra sprites for other visual effects: spell effects, smoke/flames, whatetver.  So I should try to make this general.
+
+
+6/03/25
+=======
+Speech bubbles (and other "decorations") are working, and I've now got a Conversation class that can lead to a whole dialog tree.  Defining these trees in code is a little painful, though.  I wonder if I could make it easier somehow.  But most conversation trees will be quite short, so, maybe it doesn't matter.  I think I'll wait and see how it feels when we have more real examples.
+
+So, I guess version 0.2 is done now!  I need to post a progress update on dev.to, and then start thinking about v0.3, which is going to be mostly zone transfer (e.g. entering buildings) and buying/selling items.
 

@@ -70,6 +70,14 @@ Thing.sprite = function
 	return self._sprite
 end function
 
+// Thing.decorate: a chance for things to add/update extra custom sprites as needed
+// to "decorate" this thing on the map.  Example: speech balloon above an NPC.
+// This is called when a thing is added or moved.
+Thing.decorate = null
+
+// This is called when a thing is removed from the map -- tear down any decorations.
+Thing.removeDecorations = null
+
 Thing.placeOnMap = function(x, y)
 //	if self isa Item then print "placing " + self.nameWithQty + " at " + x + "," + y
 	self.removeFromContainer
@@ -524,6 +532,7 @@ globals.Character = new CombatAgent
 // NPC: non-player characters.  They can offer dialog, trade items, etc.
 globals.NPC = new Character
 NPC.conversation = null  // a simple string, OR a Conversation object
+NPC._speechBubble = null // Sprite (decoration)
 
 NPC.Make = function(name=null, iconIdxOrImage=null, color=null)
 	if iconIdxOrImage isa number and iconIdxOrImage > 0 then
@@ -534,6 +543,36 @@ NPC.Make = function(name=null, iconIdxOrImage=null, color=null)
 	noob = super.Make(name, iconIdxOrImage, 100)
 	if color then noob.color = color
 	return noob
+end function
+
+NPC.decorate = function
+	if self.conversation == null then return
+	bubble = self.conversation.iconImage
+	if bubble == null then return
+	if self._speechBubble == null then
+		self._speechBubble = new Sprite
+		self._speechBubble.image = bubble
+		self._speechBubble.scale = 2
+		disp.sprite.sprites.push self._speechBubble
+	end if
+	disp.positionSprite self._speechBubble, self.x, self.y
+	self._speechBubble.y += 32
+end function
+
+// This is called when a thing is removed from the map -- tear down any decorations.
+NPC.removeDecorations = function
+	if self._speechBubble then
+		disp.sprite.sprites.removeVal self._speechBubble
+		self._speechBubble = null
+	end if
+end function
+
+NPC.interact = function(agent)
+	if self.conversation then
+		self.conversation.doUI self
+		self.removeDecorations
+		self.decorate
+	end if
 end function
 
 

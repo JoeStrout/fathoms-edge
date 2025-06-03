@@ -59,6 +59,7 @@ end function
 positionSprite = function(sprite, column, row)
 	sprite.x = cellSize * column + cellSize/2
 	sprite.y = cellSize * row + cellSize/2
+	sprite.z = column/1000 - row
 end function
 
 centerOn = function(column, row)
