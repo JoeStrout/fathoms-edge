@@ -1,5 +1,6 @@
-## 0.1
 You Can...
+
+## 0.1
 - ☑︎ Move around a zone, blocked by obstacles
 - ☑︎ Fight mobs
 - ☑︎ Pick up items placed by the zone loader

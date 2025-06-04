@@ -6,10 +6,11 @@ _Fathom's Edge_ is a fantasy role-playing game for [Mini Micro](https://miniscri
 
 ## Status
 
-_Fathom's Edge_ is currently at version **0.1**.  See the [road map](roadmap.md) for a concise list of what's done, and what is still to do.
+_Fathom's Edge_ is currently at version **0.2**.  See the [road map](roadmap.md) for a concise list of what's done, and what is still to do.
 
 ## Progress Reports
 - [Progress Report #1](https://dev.to/joestrout/fathoms-edge-progress-report-1-2llb)
+- [Progress Report #2](https://dev.to/joestrout/fathoms-edge-progress-report-2-5d8m)
 
 See also the internal [development log](progress.md).
 
