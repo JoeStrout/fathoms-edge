@@ -130,6 +130,7 @@ drawMouseInfo = function(left = 780, bottom = 600)
 	w = 960 - left - 8
 	h = 640 - bottom - 8
 	gfx.fillRect left, bottom, w, h, color.black
+	idx = -1
 	if palPos.contains(mouse) then
 		row = floor((palPos.top - mouse.y) / 16)
 		col = floor((mouse.x - palPos.left) / 16)
@@ -144,12 +145,16 @@ drawMouseInfo = function(left = 780, bottom = 600)
 		col = disp.colForScreenX(mouse.x)
 		row = disp.rowForScreenY(mouse.y)
 		elem = zone.element(col, row)
-		idx = elem.id
-		name = elem.name
-		gfx.print "Pos: " + col + ", " + row, left+2, bottom+h-16, color.silver, "small"
+		if elem then
+			idx = elem.id
+			name = elem.name
+			gfx.print "Pos: " + col + ", " + row, left+2, bottom+h-16, color.silver, "small"
+		end if
 	end if
-	gfx.print hex2(idx) + " (" + idx + "): " + name[:13],
-	  left+2, bottom+2, color.silver, "small"
+	if idx >= 0 then
+		gfx.print hex2(idx) + " (" + idx + "): " + name[:13],
+		  left+2, bottom+2, color.silver, "small"
+	end if
 end function
 
 handleKey = function(k)
@@ -171,11 +176,31 @@ end function
 
 setup = function
 	zone.elemPalette = MapElement.LoadFromFile(palettePath)
-	if file.exists(zonePath) then
-		zone.loadElemMap zonePath
+
+	prevDir = file.curdir
+	file.setdir "/usr/data"
+	dlog = textUtil.FileDialog.make("Select zone (.dat) file", 64)
+	dlog.title += ", or Cancel for new"
+	hit = dlog.show
+	file.setdir prevDir
+	if hit == dlog.cancelBtn then
+		name = input("Enter new zone (.dat) file name: ")
+		if not name then exit
+		if not name.endsWith(".dat") then name += ".dat"
+		outer.zonePath = "/usr/data/" + name
+		width = input("Width: ").val
+		height = input("Height: ").val
+		if width < 1 or height < 1 then
+			print "Width and height must be at least 1."
+			exit
+		end if
+		zone.clearToSize width, height, 0
+		text.clear
 	else
-		zone.clearToSize 40,30, 0
+		outer.zonePath = dlog.selection
+		zone.loadElemMap zonePath
 	end if
+
 	drawPalette
 	drawSwatches
 end function

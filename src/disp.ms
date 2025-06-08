@@ -50,7 +50,7 @@ init = function
 	text.color = color.orange
 	text.clear
 	
-	for d in [background, main, overlay, sprite, gfx]
+	for d in [bgColor, background, main, overlay, sprite, gfx]
 		d.scrollX = 0
 		d.scrollY = 0
 	end for
@@ -65,7 +65,7 @@ end function
 centerOn = function(column, row)
 	sx = (column - 13) * cellSize
 	sy = (row - 11) * cellSize
-	for d in [background, main, overlay, sprite]
+	for d in [bgColor, background, main, overlay, sprite]
 		d.scrollX = sx
 		d.scrollY = sy
 	end for
@@ -78,5 +78,19 @@ end function
 rowForScreenY = function(screenY)
 	return floor((screenY + main.scrollY) / cellSize)
 end function
+
+fadeInOut = function(startAlpha, endAlpha)
+	display(0).mode = displayMode.solidColor
+	for alpha in range(startAlpha, endAlpha, 4*sign(endAlpha - startAlpha))
+		display(0).color = color.rgba(0, 0, 0, alpha)
+		yield
+	end for
+	if endAlpha < 1 then
+		display(0).mode = displayMode.text
+	end if
+end function
+
+fadeOut = function; fadeInOut 0, 255; end function
+fadeIn = function; fadeInOut 255, 0; end function
 
 init

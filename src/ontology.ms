@@ -146,6 +146,46 @@ end function
 Thing.interact = function(agent)
 end function
 
+// Portal: a thing that players may be able to enter to go to another
+// zone (or, possibly, another place on the same zone, though I'm not
+// sure when that would be appropriate).
+globals.Portal = new Thing
+Portal.name = "portal"
+Portal.iconIdx = 290	// or use 0 for an invisible (tile-based) portal
+Portal.targetZone = ""  // name of zone to jump to
+Portal.targetX = 0		// ...and where to go in that zone
+Portal.targetY = 0
+Portal.usable = true	// replace with a function if needed
+Portal.blocksMovement = true
+
+Portal.Make = function(targetZone, targetX=0, targetY=0, iconIdx=null)
+	portal = new Portal
+	portal.targetZone = targetZone
+	portal.targetX = targetX
+	portal.targetY = targetY
+	if iconIdx != null then portal.iconIdx = iconIdx
+	return portal
+end function
+
+Portal.interact = function(agent)
+	if not self.usable then
+		agent.note "The " + self.name + " won't open."
+		return
+	end if
+	zone.moveThing agent, self.x, self.y
+	agent.note "You go through the " + self.name + "."
+	ui.update
+	disp.fadeOut
+	loadStartTime = time
+	import self.targetZone
+	locals[self.targetZone].load
+	agent.placeOnMap self.targetX, self.targetY
+	disp.centerOn player.x, player.y
+	loadDuration = time - loadStartTime
+	wait 0.5 - loadDuration
+	disp.fadeIn
+end function
+
 // Obstacle: things that go on the map, generally don't move around,
 // and block movement by the player and mobs.
 globals.Obstacle = new Thing

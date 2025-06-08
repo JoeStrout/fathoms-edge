@@ -12,20 +12,26 @@ ensureImport "commonMobs"
 palettePath = "/usr/data/mapElements.tsv"
 zonePath = "/usr/data/town.dat"
 
+connectPortal = function(x, y, targetZone, targetX, targetY)
+	// First, confirm that the map actually has a portal at that location
+	elem = zone.element(x, y)
+	tileName = elem.name
+	if tileName != "caveEntrance" then
+		print "OOPS!  Expected some portal at " + x + "," + y +
+		  ", but found " + tileName + " (#" + elem.id + ") instead."
+		exit
+	end if
+	// Then, add the portal to the map.
+	portal = Portal.Make(targetZone, targetX, targetY, 0)
+	portal.placeOnMap x, y
+end function
+
 load = function
 	zone.elemPalette = MapElement.LoadFromFile(palettePath)
 	zone.loadElemMap zonePath
 
-	Bone.Make.placeOnMap 8, 3
-	
-	chest = Chest.Make
-	chest.placeOnMap 15, 8
-	chest.contain DiamondRing.Make	
-	item = Amulet.Make; item.resistance.shock = 5; chest.contain item	
-	chest.contain Bread.Make	
-	chest.contain Buckler.Make
-	
-	
+	Bone.Make.placeOnMap 3, 8
+		
 	Sign.Make("Welcome to Fathom's Edge").placeOnMap 20, 20
 	Sign.Make("East: Fathom's Edge; South: Fathom", 224).placeOnMap 16, 7
 	
@@ -80,12 +86,12 @@ load = function
 //		shroom.placeOnMap floor(40*rnd), floor(30*rnd)
 //	end for
 
-	for i in range(1)
+	for i in []//range(1)
 		rat = Rat.Make
 		rat.placeOnMap floor(40*rnd), floor(30*rnd)
 	end for	
 	
-	for i in range(1)
+	for i in []//range(1)
 		slime = Slime.Make
 		if rnd < 0.5 then slime.contain RingOfProtection.Make
 		slime.placeOnMap floor(40*rnd), floor(30*rnd)
@@ -104,6 +110,7 @@ load = function
 	Balen.conversation = Conversation.Make("Nice day for fishin', ain't it?")
 	Balen.placeOnMap 16, 16
 
+	connectPortal 8, 3, "grotto", 6, 4
 	
 	player.placeOnMap 15, 10
 end function

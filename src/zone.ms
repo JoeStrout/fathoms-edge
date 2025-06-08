@@ -18,6 +18,7 @@ cellSize = disp.main.cellSize - disp.main.overlap
 things = null	// 2D array containing list of things for each [x][y] cell
 mapElems = null	// 2D array of MapElement instance (static content), [x][y]
 agents = []		// flat list of agents in the zone
+portals = []	// list of Portal instances in the zone
 elemPalette = [null] * 256	// palette of MapElements we draw from
 
 OOBElement = new MapElement

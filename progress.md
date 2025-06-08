@@ -211,8 +211,8 @@ AAAD4A74Hfwd/A74E+QMGBPkDBgT5AwYE+QMGAPgAAA= (5+ coins)
 Implemented that.  Working like a charm!  I don't have any special sorting for it in the inventory list, but I'm going to wait on that until I have a stronger sense of how we want to sort that in general.  So I'm calling the "gold" feature done for now.
 
 
-5/27/25
-=======
+## May 27, 2025
+
 Working on support for signs, which should show their sign text when you bump into them.  I'm currently approaching this by adding a `class` column to mapElements.tsv, which lets you specify some MapElement subclass to use for certain palette entries.  And that lets us overwrite a standard `bump` method with a custom one.
 
 Trouble is, that's not really good enough for signs... because each sign generally needs unique text.  And this custom object is just a palette entry; it's the same everywhere that line appears.  Where do we get the custom data?
@@ -222,8 +222,8 @@ Maybe a sign should be a Thing instead of a custom map element.  But it'd still 
 So, I've now re-implemented signs as Obstacles (a type of Thing), placed in town.ms, and it seems to be working fine.  I've deleted the Sign subclass of MapElement, and the two sign lines in the palette, but for now left the MapElement subclassing code in place.  Maybe it will be useful in other situations.
 
 
-5/29/25
-=======
+## May 29, 2025
+
 I think I've got containers implemented.  The item list for both player inventory and containers is limited to 10 rows or so, beyond which Bad Things will happen; but I can fix that in version 0.5, which I'm thinking of as the "polish" release.
 
 Before I call it quits, I'm going to move the various object definitions I've currently got scattered around main.ms and town.ms into commonItems.ms.  I suppose to satisfy GitHub's silly "popularity" measure, I should really make a separate file for each item, but as most of them are only 3 or 4 lines long, I just can't bring myself to do that yet.
@@ -231,8 +231,8 @@ Before I call it quits, I'm going to move the various object definitions I've cu
 I'll make a commonMobs.ms file too.  These two files together will provide a common library of items & monsters for adventure creators to either use as-is, or to calibrate their own creations against.
 
 
-5/31/25
-=======
+## May 31, 2025
+
 The last feature for 0.2 is "basic NPC conversation."  I'm picturing this: an NPC with something to say that you haven't already heard gets a little speech bubble over their head, with one of these icons:
 
 - question mark: needs help (probably offering a quest)
@@ -245,14 +245,23 @@ The last feature for 0.2 is "basic NPC conversation."  I'm picturing this: an NP
 If there is no speech balloon, then this means you've already heard what the NPC has to say (or they have nothing unique to say).  When you interact with an NPC, it will display their icon, enlarged, along with their message.  In some cases, all you can do at that point is click OK (or press Return) to exit the dialog.  In other cases, there may be several possible responses for you to choose from.
 
 
-6/01/25
-=======
+## June 1, 2025
+
 I need to make speech bubbles appear over the heads of NPCs with something to say.  Later, I might also need extra sprites for other visual effects: spell effects, smoke/flames, whatetver.  So I should try to make this general.
 
 
-6/03/25
-=======
+## June 3, 2025
+
 Speech bubbles (and other "decorations") are working, and I've now got a Conversation class that can lead to a whole dialog tree.  Defining these trees in code is a little painful, though.  I wonder if I could make it easier somehow.  But most conversation trees will be quite short, so, maybe it doesn't matter.  I think I'll wait and see how it feels when we have more real examples.
 
 So, I guess version 0.2 is done now!  I need to post a progress update on dev.to, and then start thinking about v0.3, which is going to be mostly zone transfer (e.g. entering buildings) and buying/selling items.
+
+
+## June 8, 2025
+
+I've updated mapEditor.ms so that it can edit other data files, and used it to create a small zone called "grotto.dat".  This includes a portal (tile 99, caveEntrance), which I've placed both in the grotto and in the woods of town.dat.
+
+So, the next step is to actually hook these up so you can transfer from one to the other.
+
+I started writing a custom Portal class within zone.ms, but upon reflection, I think it's better that these be Things like anything else on the map.  That means we'll be placing them in code (for now), but it still just makes everything neater.  And if we ever want to have portals that move (e.g. vehicles?), this will make it dramatically easier.
 

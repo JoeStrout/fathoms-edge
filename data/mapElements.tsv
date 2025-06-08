@@ -15,21 +15,22 @@ id	basedOnId	class	name	bgColor$	bgTileId$	bgTileColor$	mainTileId$	mainTileColo
 25	24		house2				609	#CC9999											
 26			house3				673	#9999CC											
 27			house4				640	#CCCC66											
-																			
-																			
-																			
-																			
-																			
-																			
-																			
-																			
-																			
-																			
-																			
-																			
-																			
-																			
-																			
+96			caveInterior	#996600	168	#000000													
+97	96		caveCorridorNS		136,136F														
+98	96		caveCorridorEW		136R,136RF														
+99			caveEntrance	#CC9900	140	#333300													
+104	96		caveCorridorNES		138														
+105	96		caveCorridorESW		138R														
+106	96		caveCorridorSWN		138F														
+107	96		caveCorridorWNE		138L														
+112	96		caveCornerES		170														
+113	96		caveCornerSW		170R														
+114	96		caveCornerWN		170U														
+115	96		caveCornerNE		170L														
+120	96		caveWallW		169														
+121	96		caveWallN		169R														
+122	96		caveWallE		169U														
+123	96		caveWallS		169L														
 																			
 																			
 																			

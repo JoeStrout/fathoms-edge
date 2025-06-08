@@ -4,7 +4,6 @@ ensureImport "disp"
 ensureImport "zone"
 ensureImport "mapTools"
 ensureImport "ontology"
-ensureImport "town"
 ensureImport "ui"
 ensureImport "keyboardInput"
 ensureImport "visualFX"
@@ -35,6 +34,7 @@ setup = function
 	player.contain armor
 	player.loadout.equip armor
 	
+	import "town"
 	town.load
 	globals.turn = 0
 	globals.gameOver = false
