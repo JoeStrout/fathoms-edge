@@ -12,23 +12,9 @@ ensureImport "commonMobs"
 palettePath = "/usr/data/mapElements.tsv"
 zonePath = "/usr/data/town.dat"
 
-connectPortal = function(x, y, targetZone, targetX, targetY)
-	// First, confirm that the map actually has a portal at that location
-	elem = zone.element(x, y)
-	tileName = elem.name
-	if tileName != "caveEntrance" then
-		print "OOPS!  Expected some portal at " + x + "," + y +
-		  ", but found " + tileName + " (#" + elem.id + ") instead."
-		exit
-	end if
-	// Then, add the portal to the map.
-	portal = Portal.Make(targetZone, targetX, targetY, 0)
-	portal.placeOnMap x, y
-end function
-
 load = function
-	zone.elemPalette = MapElement.LoadFromFile(palettePath)
-	zone.loadElemMap zonePath
+	palette = MapElement.LoadFromFile(palettePath)
+	zone.current = Zone.LoadMapElems(palette, zonePath)
 
 	Bone.Make.placeOnMap 3, 8
 		
@@ -110,8 +96,10 @@ load = function
 	Balen.conversation = Conversation.Make("Nice day for fishin', ain't it?")
 	Balen.placeOnMap 16, 16
 
-	connectPortal 8, 3, "grotto", 6, 4
+	zone.current.connectPortal 8, 3, "grotto", 6, 4, "You enter the cave."
 	
 	player.placeOnMap 15, 10
+	
+	zone.current.activate
 end function
 

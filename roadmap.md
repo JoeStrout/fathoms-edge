@@ -20,7 +20,7 @@ You Can...
 - ☐ See info about items on the map by mousing over them
 - ☐ Buy/sell items from NPCs
 - ☐ Ask NPCs about arbitrary topics
-- ☐ Transfer between zones via doors/portals
+- ☑︎ Transfer between zones via doors/portals
 - ☐︎ Visit specialized shops in town: smith, alchemist, librarian, grocer
 
 ## 0.4

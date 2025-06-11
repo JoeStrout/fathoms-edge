@@ -84,11 +84,11 @@ Thing.placeOnMap = function(x, y)
 	self.removeFromMap
 	self.x = x
 	self.y = y
-	zone.addThing self, x, y
+	zone.current.addThing self, x, y
 end function
 
 Thing.removeFromMap = function
-	zone.removeThing self
+	zone.current.removeThing self
 	self.x = -1
 	self.y = -1
 end function
@@ -157,6 +157,9 @@ Portal.targetX = 0		// ...and where to go in that zone
 Portal.targetY = 0
 Portal.usable = true	// replace with a function if needed
 Portal.blocksMovement = true
+Portal.useNote = function
+	return "You go through the " + self.name + "."
+end function
 
 Portal.Make = function(targetZone, targetX=0, targetY=0, iconIdx=null)
 	portal = new Portal
@@ -172,13 +175,12 @@ Portal.interact = function(agent)
 		agent.note "The " + self.name + " won't open."
 		return
 	end if
-	zone.moveThing agent, self.x, self.y
-	agent.note "You go through the " + self.name + "."
+	zone.current.moveThing agent, self.x, self.y
+	agent.note self.useNote
 	ui.update
 	disp.fadeOut
 	loadStartTime = time
-	import self.targetZone
-	locals[self.targetZone].load
+	zone.load self.targetZone
 	agent.placeOnMap self.targetX, self.targetY
 	disp.centerOn player.x, player.y
 	loadDuration = time - loadStartTime
@@ -337,16 +339,16 @@ end function
 // success, false if we weren't able to move.
 Agent.attemptMove = function(dx, dy)
 	if self.container then return false	// can't move while in container
-	if not zone.passable(self.x + dx, self.y + dy, self) then
+	if not zone.current.passable(self.x + dx, self.y + dy, self) then
 		// Not passable — bump!  Interact with whatever's in that space.
-		zone.interact self.x + dx, self.y + dy, self
+		zone.current.interact self.x + dx, self.y + dy, self
 		return false
 	end if
-	stuff = zone.getItems(self.x + dx, self.y + dy)
+	stuff = zone.current.getItems(self.x + dx, self.y + dy)
 	for item in stuff
 		self.pickUp item
 	end for
-	zone.moveThing self, self.x + dx, self.y + dy
+	zone.current.moveThing self, self.x + dx, self.y + dy
 	self.x += dx
 	self.y += dy
 	return true
@@ -413,7 +415,7 @@ CombatAgent.dead = function; return self.health <= 0; end function
 
 CombatAgent.update = function
 	// update status effects
-	e = zone.element(self.x, self.y)
+	e = zone.current.element(self.x, self.y)
 	if e.waterDepth == 1 then
 		self.statuses.apply status.WADING, 1
 	else if e.waterDepth > 1 then
@@ -469,14 +471,14 @@ end function
 
 CombatAgent.die = function
 	self.dead = true
-	zone.removeThing self
+	zone.current.removeThing self
 	if self.leavesCorpse then
-		zone.addThing self.makeCorpse, self.x, self.y
+		zone.current.addThing self.makeCorpse, self.x, self.y
 	else if self.contents then
 		loot = self.contents.items
 		self.contents = null
 		for item in loot
-			zone.addThing item, self.x, self.y
+			zone.current.addThing item, self.x, self.y
 		end for
 	end if
 end function	
@@ -523,7 +525,7 @@ Mob.availableSteps = function
 			if not dx and not dy then continue
 			x = self.x + dx
 			y = self.y + dy
-			if zone.passable(x, y, self) then
+			if zone.current.passable(x, y, self) then
 				d = mathUtil.distance([x,y], player)
 				result.push [dx, dy, d]
 			end if
@@ -594,6 +596,8 @@ NPC.decorate = function
 		self._speechBubble.image = bubble
 		self._speechBubble.scale = 2
 		disp.sprite.sprites.push self._speechBubble
+	else if not disp.sprite.sprites.contains(self._speechBubble) then
+		disp.sprite.sprites.push self._speechBubble	
 	end if
 	disp.positionSprite self._speechBubble, self.x, self.y
 	self._speechBubble.y += 32
@@ -660,7 +664,7 @@ Player.handleCommand = function(cmd)
 	if cmd == "WEST" then dx = -1
 	if dx or dy then
 		// check for mob to melee attack in this direction
-		mob = zone.getMob(self.x + dx, self.y + dy)
+		mob = zone.current.getMob(self.x + dx, self.y + dy)
 		if mob then
 			combat.doMeleeAttack self, mob
 			return 1

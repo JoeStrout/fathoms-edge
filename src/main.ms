@@ -34,8 +34,7 @@ setup = function
 	player.contain armor
 	player.loadout.equip armor
 	
-	import "town"
-	town.load
+	zone.load "town"
 	globals.turn = 0
 	globals.gameOver = false
 end function
@@ -43,7 +42,7 @@ end function
 updateAll = function(newTurn=false)
 	if newTurn then
 		globals.turn += 1
-		for agent in zone.agents
+		for agent in zone.current.agents
 			agent.update
 			if agent == player then disp.centerOn player.x, player.y
 		end for

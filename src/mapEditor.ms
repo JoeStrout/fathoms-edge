@@ -41,7 +41,7 @@ drawPalette = function(left=800, bottom=80)
 		if col == 0 then
 			gfx.print hex2(i), x - 20, y + 1, color.silver, "small"
 		end if
-		if i < zone.elemPalette.len then elem = zone.elemPalette[i] else elem = null
+		if i < zone.current.elemPalette.len then elem = zone.current.elemPalette[i] else elem = null
 		if elem == null then
 			gfx.line x, y, x+16, y+16, color.red
 			gfx.line x+16, y, x, y+16, color.red			
@@ -74,7 +74,7 @@ handleMapClick = function
 	row = disp.rowForScreenY(mouse.y)
 	shift = key.pressed("left shift") or key.pressed("right shift")
 	alt = key.pressed("left alt") or key.pressed("right alt")
-	if shift or zone.element(col,row) == zone.elemPalette[foreId] then
+	if shift or zone.current.element(col,row) == zone.current.elemPalette[foreId] then
 		penId = backId
 	else
 		penId = foreId
@@ -87,13 +87,13 @@ handleMapClick = function
 		if col == lastCol and row == lastRow then continue
 		lastCol = col; lastRow = row
 		if alt then
-			idx = zone.element(col, row).id
+			idx = zone.current.element(col, row).id
 			if idx < 0 then continue
 			if shift then globals.backId = idx else globals.foreId = idx
 			drawSwatches
 		else
-			zone.setElement col, row, penId
-			zone.elemPalette[penId].apply col, row
+			zone.current.setElement col, row, penId
+			zone.current.elemPalette[penId].apply col, row
 		end if
 	end while
 end function
@@ -103,9 +103,9 @@ drawSwatch = function(elemId, left=820, bottom=20, label="Draw to:")
 	h = 32
 	gfx.fillRect left-20, bottom-20, w+40, h+40, color.clear
 	pic = null
-	if elemId < zone.elemPalette.len and zone.elemPalette[elemId] then
+	if elemId < zone.current.elemPalette.len and zone.current.elemPalette[elemId] then
 		tempG.clear color.black, 16, 16
-		zone.elemPalette[elemId].drawPaletteEntry 0, 0, tempG
+		zone.current.elemPalette[elemId].drawPaletteEntry 0, 0, tempG
 		pic = tempG.getImage
 	end if
 	gfx.fillRect left, bottom, w, h, color.black
@@ -136,15 +136,15 @@ drawMouseInfo = function(left = 780, bottom = 600)
 		col = floor((mouse.x - palPos.left) / 16)
 		idx = row * 8 + col
 		name = "(null)"
-		if idx < zone.elemPalette.len then
-			elem = zone.elemPalette[idx]
+		if idx < zone.current.elemPalette.len then
+			elem = zone.current.elemPalette[idx]
 			if elem then name = elem.name
 		end if		
 		gfx.print "MapElement:", left+2, bottom+h-16, color.silver, "small"
 	else
 		col = disp.colForScreenX(mouse.x)
 		row = disp.rowForScreenY(mouse.y)
-		elem = zone.element(col, row)
+		elem = zone.current.element(col, row)
 		if elem then
 			idx = elem.id
 			name = elem.name
@@ -159,7 +159,7 @@ end function
 
 handleKey = function(k)
 	if k == "s" then
-		zone.saveElemMap zonePath
+		zone.current.saveElemMap zonePath
 		Dialog.make("Map Saved", zonePath).show
 	else if k == "q" or k == char(27) then
 		dlog = Dialog.make("Quit the map editor?", "Any unsaved changes will be lost.")
@@ -175,7 +175,7 @@ handleKey = function(k)
 end function
 
 setup = function
-	zone.elemPalette = MapElement.LoadFromFile(palettePath)
+	zone.current.elemPalette = MapElement.LoadFromFile(palettePath)
 
 	prevDir = file.curdir
 	file.setdir "/usr/data"
@@ -194,11 +194,11 @@ setup = function
 			print "Width and height must be at least 1."
 			exit
 		end if
-		zone.clearToSize width, height, 0
+		zone.current.clearToSize width, height, 0
 		text.clear
 	else
 		outer.zonePath = dlog.selection
-		zone.loadElemMap zonePath
+		zone.current.loadElemMap zonePath
 	end if
 
 	drawPalette

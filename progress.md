@@ -145,7 +145,7 @@ I guess for now I can punt, and just have a single palette that's used for all t
 
 ## May 18, 2025
 
-I'm struggling a bit to decide how I want to represent items in a zone.  There are two aspects to this problem: (1) defining the _types_ of items that can be found, and (2) defining where they are actually found.
+I'm struggling a bit to decide how I want to represent items in a zone.current.  There are two aspects to this problem: (1) defining the _types_ of items that can be found, and (2) defining where they are actually found.
 
 For defining the types, in most cases it is about the same to do that in MiniScript code or in GRFON.  For example, we could say in GRFON:
 
@@ -263,5 +263,18 @@ I've updated mapEditor.ms so that it can edit other data files, and used it to c
 
 So, the next step is to actually hook these up so you can transfer from one to the other.
 
-I started writing a custom Portal class within zone.ms, but upon reflection, I think it's better that these be Things like anything else on the map.  That means we'll be placing them in code (for now), but it still just makes everything neater.  And if we ever want to have portals that move (e.g. vehicles?), this will make it dramatically easier.
+I started writing a custom Portal class within zone.current.ms, but upon reflection, I think it's better that these be Things like anything else on the map.  That means we'll be placing them in code (for now), but it still just makes everything neater.  And if we ever want to have portals that move (e.g. vehicles?), this will make it dramatically easier.
+
+Initial portal functionality is now working; you can go from town to the grotto and back.  But currently, it loads the target zone from disk every time, which means it completely resets; you can get an infinite amount of whatever any zone contains just by repeatedly entering and leaving it.
+
+So, I need to refactor zone.current.ms so that all the zone data is in a Zone object (with perhaps module-level wrappers for the currently active zone).  And then add -- either in zone.current.ms or in zoneMgr.ms (currently empty, and perhaps overkill) -- a simple cache of zone names to Zone objects, so we only load from disk the first time.
+
+
+## June 10, 2025
+
+I've finished refactoring Zone into a proper class.  Other code now references `zone.current` to get to the current zone, and uses `zone.load` to either load a zone from disk (and code), or reactivate a previously-loaded zone, as the case may be.  I'm able to pass back and forth between the town and the grotto, without duplicating any objects or losing any game state.
+
+That's the biggest feature for v0.3; the next-biggest is buying and selling items from NPCs.  I think I'll hook that into the conversation trees, and ideally, reuse the container UI — but modified slightly to indicate actual prices, and to confirm before buying or selling items.
+
+I've started thinking about the Alyce/Fido quest, too.  Fido can be an NPC with a small conversation tree ("Who's a good boy?"/"Ruff!"), through which you can give him a bone if you have one — only then will he follow you, so you can return him to Alyce.  And maybe he's found in the grotto, rather than just wandering around town.
 
