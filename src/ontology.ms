@@ -11,6 +11,9 @@ ensureImport "damType"
 ensureImport "loadout"
 ensureImport "combat"
 ensureImport "inventory"
+ensureImport "miscUtil"
+
+base64ToImage = @miscUtil.base64ToImage
 
 // Thing: base class for anything that can appear in the world (or
 // inside a container).  These will be drawn as sprites, if image is
@@ -41,6 +44,9 @@ Thing.Make = function(name=null, iconIdxOrImage=null, capacity=0)
 	noob.id = Thing.UnusedId
 	Thing.ByID[noob.id] = noob
 	if name != null then noob.name = name
+	if iconIdxOrImage isa string then
+		iconIdxOrImage = base64ToImage(iconIdxOrImage)
+	end if
 	if iconIdxOrImage isa number then
 		noob.iconIdx = iconIdxOrImage
 	else if iconIdxOrImage isa Image then
@@ -276,15 +282,34 @@ Item.destroyOne = function
 	self.qty -= 1
 end function
 
+// Consumable: one-use items that apply some health benefit and/or status
+// effects to the target (usually, the user).
+globals.Consumable = new Item
+Consumable.usable = true
+Consumable.healthGain = 0
+Consumable.statusEffects = null // map: status effect -> duration
+Consumable.useBy = function(target)
+	if target isa CombatAgent then
+		target.health += self.healthGain
+		if self.statusEffects != null then
+			for kv in self.statusEffects
+				target.statuses.apply kv.key, kv.value
+			end for
+		end if
+	end if
+	self.destroyOne
+end function
+
 // Food: items you can eat.
-globals.Food = new Item
+globals.Food = new Consumable
 Food.usable = true
 Food.usedVerb = "ate"
 Food.healthGain = 5
-Food.useBy = function(agent)
-	if agent isa CombatAgent then agent.health += self.healthGain
-	self.destroyOne
-end function
+
+// Drink: items you can drink (e.g. potions).
+globals.Drink = new Consumable
+Drink.usable = true
+Drink.usedVerb = "drank"
 
 
 // Equipment: items you can equip (i.e. put in an equipment slot).
@@ -325,6 +350,14 @@ Agent.update = null
 Agent.blocksMovement = true
 Agent.qty = null
 Agent.stackable = false
+Agent.saleMarkup = 1.5	// factor times value at which we'll sell stuff
+Agent.buyDiscount = 0.7	// factor times value at which we'll buy stuff
+
+// Agent.nameWithArticle: We assume that agents generally have proper
+// names, so don't use articles.  Override this as needed for special cases.
+Agent.nameWithArticle = function(aOrThe="a", forceSingular=false)
+	return self.name.titleCase
+end function
 
 // Agent.note: this is called with short messages describing things
 // this agent does, or that happen to this agent.  If it's the Player,
@@ -362,6 +395,56 @@ Agent.pickUp = function(item)
 	self.contain item
 	self.note "Picked up {what}.".fill(locals)
 end function
+
+// Agent.getSalePrice: get the price at which we'll sell the given item.
+// If not willing to sell at any price, return null.
+Agent.getSalePrice = function(item)
+	return ceil(item.value * self.saleMarkup)
+end function
+
+// Agent.getBuyPrice: get the price at which we'll buy the given item.
+// If we don't want it at any price (even free), return null.
+Agent.getBuyPrice = function(item)
+	return floor(item.value * self.buyDiscount)
+end function
+
+// Agent.gold: get the total of all gold in our inventory.
+Agent.gold = function
+	sum = 0
+	for item in self.contents.items
+		if item isa Gold then sum += item.qty
+	end for
+	return sum
+end function
+
+// Agent.addGold: add the given (possibly negative) amount of
+// gold to our inventory.
+Agent.addGold = function(coinsToAdd)
+	if coinsToAdd == 0 then return
+	if coinsToAdd > 0 then
+		for item in self.contents.items
+			if item isa Gold then
+				item.qty += coinsToAdd
+				item.noteQtyChanged
+				return
+			end if
+		end for
+		self.contents.add Gold.Make(coinsToAdd)
+	else
+		for i in range(self.contents.items.len-1, 0, -1)
+			item = self.contents.items[i]
+			if not item isa Gold then continue
+			if item.qty > -coinsToAdd then
+				item.qty += coinsToAdd
+				item.noteQtyChanged
+				return
+			end if
+			self.contents.items.remove i
+			coinsToAdd += item.qty
+		end for
+	end if
+end function
+			
 
 // Handle a command -- typically this is called on the Player, and the
 // command comes from some keyboard input.  But NPC code can use this too,

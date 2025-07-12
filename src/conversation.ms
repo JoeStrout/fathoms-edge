@@ -48,13 +48,20 @@ ConvNode.addResponse = function(speech, callback)
 	return resp
 end function
 
+ConvNode.addBuySell = function(msg="[Buy/Sell]")
+	resp = self.addResponse(msg)
+	resp.callback = function(npc)
+		ui.showContainerUI player, npc 
+	end function
+end function
 
 // ConvResponse: a response the player can select to a ConvNode.  These
 // may lead to more ConvNodes, or they may terminate the conversation.
 globals.ConvResponse = {}
 ConvResponse.speech = "Yes."
 ConvResponse.next = null      // ConvNode, or null
-ConvResponse.callback = null  // function invoked when this response is selected
+ConvResponse.callback = function(npc)  // function invoked when this response is selected
+end function
 
 // Conversation: wraps up a whole ConvNode tree.
 globals.Conversation = {}
@@ -158,7 +165,7 @@ Conversation.doUI = function(npc)
 	while node
 		choice = self.doOneNodeUI(npc, node)
 		if choice != null then
-			node.responses[choice].callback
+			node.responses[choice].callback npc
 			node = node.responses[choice].next
 		else
 			node = null

@@ -94,9 +94,26 @@ end function
 
 globals.Bread = new Food
 Bread.Make = function
-	item = Food.Make("bread", 911)
+	item = super.Make("bread", 911)
 	item.color = "#CCCC33"
 	item.size = 2
+	return item
+end function
+
+globals.RawFish = new Food
+RawFish.Make = function
+	item = super.Make("raw fish", 945)
+	item.color = "#CCCCCC"
+	item.size = 2
+	return item
+end function
+
+globals.Ale = new Drink
+Ale.statusEffects = {status.TIPSY: 6}
+Ale.Make = function
+	item = super.Make("ale", "AAAAAAPwBAgECBvwJAgl6CbYJ/ge2Af4BtgD8AAAAAA=")
+	item.color = "#FFFF66"
+	item.value = 2
 	return item
 end function
 

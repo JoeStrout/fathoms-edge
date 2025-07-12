@@ -57,8 +57,15 @@ draw = function(items, loadout, title, selItemIdx = -1, toLeft=null)
 	putInContainer = @outer.putInContainer
 	takeFromContainer = @outer.takeFromContainer
 	
+	selling = toLeft and outer.container isa Agent
+	buying = not toLeft and outer.container isa Agent
+	
 	for i in items.indexes
 		item = items[i]
+		price = item.totalValue
+		if selling then price = container.getBuyPrice(item)
+		if buying then price = container.getSalePrice(item)
+
 		if i == selItemIdx then
 			gfx.fillRect left+6, y-4, width-12, 18, "#4444AA"
 			if toLeft != false then  // (i.e., not the container/chest)
@@ -72,7 +79,7 @@ draw = function(items, loadout, title, selItemIdx = -1, toLeft=null)
 				btn.item = item
 				btn.action = function; unequip self.item; end function
 				buttons.push btn
-			else if item.usable then
+			else if item.usable and not buying then
 				btn = Button.Make("Use", left + width - 100, yButton, ["u", RETURN])
 				btn.item = item
 				if toLeft == false then // i.e., is in container
@@ -88,22 +95,32 @@ draw = function(items, loadout, title, selItemIdx = -1, toLeft=null)
 			if toLeft == true then
 				buttons[0].x = left + 60
 				if buttons.len > 1 then buttons[1].x = left + width/2
-				btn = Button.Make("Put -->", left + width - 60, yButton, "pPtTmM".split(""))
+				label = "Put -->"
+				if selling then
+					if price <= 0 then label = "Give -->" else label = "Sell -->"
+				end if
+				btn = Button.Make(label, left + width - 60, yButton, "pPtTmM".split(""))
+				if selling then btn.shortcutKeys += ["s", "S", "g", "G"]
 				btn.item = item
 				btn.action = function; putInContainer self.item; end function
-				buttons.push btn
+				if price != null then buttons.push btn
 			else if toLeft == false then
-				btn = Button.Make("<-- Take", left + 60, yButton, "pPtTmM".split(""))
+				label = "<-- Take"
+				if buying then
+					label = "<-- Buy"
+				end if
+				btn = Button.Make(label, left + 60, yButton, "pPtTmM".split(""))
+				if buying then btn.shortcutKeys += ["b", "B"]
 				btn.item = item
 				btn.action = function; takeFromContainer self.item; end function
-				buttons.push btn
+				if price <= agent.gold then buttons.push btn
 			end if
 		end if
 		if loadout != null then loadout.drawSlotIconForItem item, xUse, y
 		item.drawIcon gfx, xIcon, y - 2
 		boldFont.print item.nameWithQty, xName, y, 1, textColor
 		boldFont.printRight round(item.totalSize, 1), xSize, y, 1, textColor
-		boldFont.printRight item.totalValue, xValue, y, 1, textColor
+		boldFont.printRight price, xValue, y, 1, textColor
 		y -= rowHeight
 	end for
 	globals.gfx = disp.gfx
@@ -229,6 +246,10 @@ putInContainer = function(item)
 	if not wholeStack then
 		item = agent.contents.removeItem(item, 1)
 	end if
+	if container isa Agent then
+		price = container.getBuyPrice(item)
+		agent.addGold price
+	end if
 	container.contain item
 	outer.refresh = true
 	itemName = item.nameWithArticle
@@ -243,6 +264,17 @@ takeFromContainer = function(item)
 	if item.qty == null or item.qty <= 1 then wholeStack = true
 	if not wholeStack then
 		item = container.contents.removeItem(item, 1)
+	end if
+	if container isa Agent then
+		price = container.getSalePrice(item)
+		if price > agent.gold then
+			agent.note "You don't have enough gold."
+			// ToDo: put the item back!
+			agent.update
+			ui.update
+			return
+		end if
+		agent.addGold -price
 	end if
 	agent.contain item
 	outer.refresh = true

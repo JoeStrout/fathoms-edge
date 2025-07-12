@@ -278,3 +278,9 @@ That's the biggest feature for v0.3; the next-biggest is buying and selling item
 
 I've started thinking about the Alyce/Fido quest, too.  Fido can be an NPC with a small conversation tree ("Who's a good boy?"/"Ruff!"), through which you can give him a bone if you have one — only then will he follow you, so you can return him to Alyce.  And maybe he's found in the grotto, rather than just wandering around town.
 
+
+## July 10, 2025
+
+Added support for Drink (parallel to Food, both now derived from Consumable).  These can apply both health benefits and status effects when consumed.  So potions are now easy to define (as are healthy drinks and booze).
+
+Started on buy/sell support.  This is triggered by opening an Agent as if they were a container, and involves some special logic for handling the gold.  Seems to be working well for individual items; still need to work on buying/selling full or partial stacks.

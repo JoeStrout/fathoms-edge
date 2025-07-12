@@ -62,7 +62,9 @@ load = function
 		  status.GLOWING,
 		  status.MUTE,
 		  status.PANICKED,
-		  status.SERENE]
+		  status.SERENE,
+		  status.TIPSY,
+		  status.INTOXICATED]
 		agent.statuses.apply fx.any, 5  // (lasts 5 turns)
 	end function
 	
@@ -94,11 +96,17 @@ load = function
 	
 	globals.Balen = TownsFolk.Make("Balen", 95, "#CCCC00")
 	Balen.conversation = Conversation.Make("Nice day for fishin', ain't it?")
+	Balen.conversation.top.addResponse "Sure is!"
+	Balen.conversation.top.addBuySell
 	Balen.placeOnMap 16, 16
+	Balen.contain RawFish.Make
 
 	zone.current.connectPortal 8, 3, "grotto", 6, 4, "You enter the cave."
 	
 	player.placeOnMap 15, 10
+	
+	ale = Ale.Make
+	ale.placeOnMap 16, 10
 	
 	zone.current.activate
 end function

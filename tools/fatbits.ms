@@ -9,6 +9,7 @@ if not env.importPaths.contains("/usr/src") then
 	env.importPaths.push "/usr/src"
 end if
 import "miscUtil"
+import "oneBit"
 
 // Constants and global state variables
 kModeDraw = "DRAW"
@@ -1045,7 +1046,7 @@ OpenFile.saveToDisk = function
 	text.backColor = color.clear
 	text.clear
 	return
-//	textUtil.Dialog.make("Base64 string", b64).show
+	//	textUtil.Dialog.make("Base64 string", b64).show
 	err = file.saveImage(self.path, self.image)
 	if not err then
 		dlog = textUtil.Dialog.make("Saved """ + file.name(self.path) + """",

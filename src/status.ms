@@ -30,7 +30,9 @@ PANICKED = "PANICKED"
 SERENE = "SERENE"
 SWIMMING = "SWIMMING"
 WADING = "WADING"
-
+TIPSY = "TIPSY"
+INTOXICATED = "INTOXICATED"
+NAUSEOUS = "NAUSEOUS"
 
 // A special "max" function which considers null to be greater
 // than any non-null number (i.e., null means infinite):
@@ -57,9 +59,11 @@ StatusHolder.dodgeModifier = function
 	if self.items.hasIndex(STUNNED) then return 0
 	if self.items.hasIndex(FROZEN) then return 0
 	modifier = 1
-	for st in [WEAKENED, SLOWED, BLIND, ENCUMBERED, FATIGUED, PANICKED]
+	for st in [WEAKENED, SLOWED, BLIND, ENCUMBERED, FATIGUED, PANICKED,
+				TIPSY, NAUSEOUS]
 		if self.items.hasIndex(st) then modifier *= 0.5
 	end for
+	if st == INTOXICATED then modifier *= 0.25
 	return modifier
 end function
 
@@ -67,7 +71,10 @@ end function
 // Makes use of the global turn number.
 StatusHolder.apply = function(newStatus="BLESSED", duration=10, update=true)
 	endTurn = duration + turn // (yields null if duration is null)
-	if self.items.hasIndex(newStatus) then
+	if newStatus==TIPSY and self.items.hasIndex(TIPSY) then
+		self.items[INTOXICATED] = max(self.items[TIPSY], endTurn)
+		self.items.remove TIPSY
+	else if self.items.hasIndex(newStatus) then
 		self.items[newStatus] = max(self.items[newStatus], endTurn)
 	else
 		self.items[newStatus] = endTurn
@@ -168,6 +175,13 @@ runTests = function
 	assertEqual sh.hasStatus("PERM"), true
 	sh.remove "PERM"
 	assertEqual sh.hasStatus("PERM"), false
+	
+	sh.apply TIPSY
+	assertEqual sh.hasStatus(TIPSY), true
+	sh.apply TIPSY
+	assertEqual sh.hasStatus(TIPSY), false
+	assertEqual sh.hasStatus(INTOXICATED), true
+	sh.remove INTOXICATED
 	
 	sh.apply SLOWED, 5
 	sh.update; globals.turn += 1
