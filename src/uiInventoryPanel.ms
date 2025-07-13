@@ -117,7 +117,7 @@ draw = function(items, loadout, title, selItemIdx = -1, toLeft=null)
 		end if
 		if loadout != null then loadout.drawSlotIconForItem item, xUse, y
 		item.drawIcon gfx, xIcon, y - 2
-		boldFont.print item.nameWithQty + "(" + item.container.name + ")", xName, y, 1, textColor
+		boldFont.print item.nameWithQty, xName, y, 1, textColor
 		boldFont.printRight round(item.totalSize, 1), xSize, y, 1, textColor
 		boldFont.printRight price, xValue, y, 1, textColor
 		y -= rowHeight
