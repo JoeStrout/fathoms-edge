@@ -25,7 +25,11 @@ bigPrinter.boldItalicFont = bmfFonts.Font.load("/sys/fonts/NotoSansBoldItalic-24
 
 button9Slice = Image9Slice.make(file.loadImage("/usr/pics/button.png"))
 
+coinImg1Bit = miscUtil.base64ToImage("AAAAAAPgB/AN+Bv8G/wb/Bv8G/wb/A34B/AD4AAAAAA=")
+
 keyCapCode = 57344 // plus the ASCII value of the character
+
+globals.coinChar = "¢" // aka char(162)
 
 textColor = "#88FF88"
 
@@ -48,7 +52,8 @@ keyCap = function(asciiChar)
 	return char(asciiChar.code + keyCapCode)
 end function
 
-addKeyCapGlyphs = function
+addExtraGlyphs = function
+	// add key-cap glyphs
 	kpic = file.loadImage("/usr/pics/keyCaps.png")
 	w = kpic.width / 16
 	h = kpic.height / 8
@@ -60,8 +65,14 @@ addKeyCapGlyphs = function
 			smallPrinter.font.addChar c, charpic, 0, 3
 		end for
 	end for
+	// add coin glyph (tinted yellow!)
+	tempg = new PixelDisplay
+	tempg.clear(color.clear, 16, 16)
+	tempg.drawImage coinImg1Bit, 0, 0, -1, -1, 0, 0, -1, -1, "#FFCC33"
+	globals.coinImg = tempg.getImage
+	smallPrinter.font.addChar coinChar, coinImg, 0, 2
 end function
-addKeyCapGlyphs
+addExtraGlyphs
 
 _printToImage = function(styleRuns, bgColor="#000000", width=300, printer=null)
 	if printer == null then printer = smallPrinter

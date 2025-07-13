@@ -396,15 +396,17 @@ Agent.pickUp = function(item)
 	self.note "Picked up {what}.".fill(locals)
 end function
 
-// Agent.getSalePrice: get the price at which we'll sell the given item.
+// Agent.getSalePrice: get the price at which we'll sell 1 of the given item.
 // If not willing to sell at any price, return null.
 Agent.getSalePrice = function(item)
+	if item isa Gold then return null
 	return ceil(item.value * self.saleMarkup)
 end function
 
-// Agent.getBuyPrice: get the price at which we'll buy the given item.
+// Agent.getBuyPrice: get the price at which we'll buy 1 of the given item.
 // If we don't want it at any price (even free), return null.
 Agent.getBuyPrice = function(item)
+	if item isa Gold then return null
 	return floor(item.value * self.buyDiscount)
 end function
 
@@ -429,7 +431,7 @@ Agent.addGold = function(coinsToAdd)
 				return
 			end if
 		end for
-		self.contents.add Gold.Make(coinsToAdd)
+		self.contain Gold.Make(coinsToAdd)
 	else
 		for i in range(self.contents.items.len-1, 0, -1)
 			item = self.contents.items[i]
@@ -439,7 +441,7 @@ Agent.addGold = function(coinsToAdd)
 				item.noteQtyChanged
 				return
 			end if
-			self.contents.items.remove i
+			self.contents.removeItem item
 			coinsToAdd += item.qty
 		end for
 	end if

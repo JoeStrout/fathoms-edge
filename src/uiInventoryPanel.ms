@@ -3,13 +3,12 @@
 
 import "importUtil"
 ensureImport "miscUtil"
+ensureImport "ui"
 
 width = 300
 rowHeight = 18
 
 RETURN = char(10)
-
-coinImg = miscUtil.base64ToImage("AAAAAAPgB/AN+Bv8G/wb/Bv8G/wb/A34B/AD4AAAAAA=")
 
 init = function
 	outer.boldFont = ui.smallPrinter.boldFont
@@ -46,7 +45,7 @@ draw = function(items, loadout, title, selItemIdx = -1, toLeft=null)
 	y -= rowHeight*1.5
 	thinFont.printRight "Size", xSize, y+rowHeight, 1, headColor
 	
-	gfx.drawImage coinImg, xValue - 16, y+rowHeight-4, -1, -1, 0, 0, -1, -1, "#FFCC33"
+	gfx.drawImage coinImg, xValue - 16, y+rowHeight-4
 
 	buttons = []
 	yButton = bottom + 24
@@ -118,7 +117,7 @@ draw = function(items, loadout, title, selItemIdx = -1, toLeft=null)
 		end if
 		if loadout != null then loadout.drawSlotIconForItem item, xUse, y
 		item.drawIcon gfx, xIcon, y - 2
-		boldFont.print item.nameWithQty, xName, y, 1, textColor
+		boldFont.print item.nameWithQty + "(" + item.container.name + ")", xName, y, 1, textColor
 		boldFont.printRight round(item.totalSize, 1), xSize, y, 1, textColor
 		boldFont.printRight price, xValue, y, 1, textColor
 		y -= rowHeight
@@ -246,15 +245,21 @@ putInContainer = function(item)
 	if not wholeStack then
 		item = agent.contents.removeItem(item, 1)
 	end if
+	itemName = item.nameWithArticle
+	containerName = container.nameWithArticle("the")
+	message = "Placed {itemName} in {containerName}."
 	if container isa Agent then
 		price = container.getBuyPrice(item)
-		agent.addGold price
+		if price > 0 then
+			message = "Sold {itemName} to {containerName} for {price}¢."
+			agent.addGold price
+		else
+			message = "Gave {itemName} to {containerName}."
+		end if
 	end if
 	container.contain item
 	outer.refresh = true
-	itemName = item.nameWithArticle
-	containerName = container.nameWithArticle("the")
-	agent.note "Placed {itemName} in {containerName}.".fill(locals)
+	agent.note message.fill(locals)
 	agent.update
 	ui.update
 end function
@@ -262,25 +267,37 @@ end function
 takeFromContainer = function(item)
 	wholeStack = key.shiftPressed
 	if item.qty == null or item.qty <= 1 then wholeStack = true
-	if not wholeStack then
-		item = container.contents.removeItem(item, 1)
-	end if
 	if container isa Agent then
-		price = container.getSalePrice(item)
+		unitPrice = container.getSalePrice(item)
+		buyQty = 1
+		if wholeStack then
+			// calculate how many we can afford!
+			buyQty = floor(agent.gold / unitPrice)
+			if buyQty > item.qty then buyQty = item.qty
+		end if
+		price = unitPrice * buyQty
 		if price > agent.gold then
 			agent.note "You don't have enough gold."
-			// ToDo: put the item back!
 			agent.update
 			ui.update
 			return
 		end if
 		agent.addGold -price
+		if buyQty < item.qty then
+			item = container.contents.removeItem(item, buyQty)
+		end if
+		message = "Bought {itemName} from {containerName} for {price}¢."
+	else
+		if not wholeStack then
+			item = container.contents.removeItem(item, 1)
+		end if
+		message = "Took {itemName} from {containerName}."	
 	end if
 	agent.contain item
 	outer.refresh = true
 	itemName = item.nameWithArticle
 	containerName = container.nameWithArticle("the")
-	agent.note "Took {itemName} from {containerName}.".fill(locals)
+	agent.note message.fill(locals)
 	agent.update
 	ui.update
 end function
