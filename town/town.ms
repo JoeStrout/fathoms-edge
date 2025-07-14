@@ -10,7 +10,7 @@ ensureImport "commonItems"
 ensureImport "commonMobs"
 
 palettePath = "/usr/data/mapElements.tsv"
-zonePath = "/usr/data/town.dat"
+zonePath = "/usr/town/town.dat"
 
 load = function
 	palette = MapElement.LoadFromFile(palettePath)
@@ -100,7 +100,12 @@ load = function
 	Balen.conversation.top.addBuySell
 	Balen.placeOnMap 16, 16
 	Balen.contain RawFish.Make
-
+	Balen.getBuyPrice = function(item)
+		// Balen will only buy food and drink
+		if not item isa Consumable then return null
+		return super.getBuyPrice(item)
+	end function
+	
 	zone.current.connectPortal 8, 3, "grotto", 6, 4, "You enter the cave."
 	
 	player.placeOnMap 15, 10

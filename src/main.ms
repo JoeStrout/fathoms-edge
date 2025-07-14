@@ -9,6 +9,10 @@ ensureImport "keyboardInput"
 ensureImport "visualFX"
 
 setup = function
+	if not env.importPaths.contains("/usr/town") then
+		env.importPaths.push "/usr/town"
+	end if
+	
 	globals.player = Player.Make
 	
 	sword = Weapon.Make("sword", 898, loadout.TWOHAND)

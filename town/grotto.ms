@@ -10,7 +10,7 @@ ensureImport "commonItems"
 ensureImport "commonMobs"
 
 palettePath = "/usr/data/mapElements.tsv"
-zonePath = "/usr/data/grotto.dat"
+zonePath = "/usr/town/grotto.dat"
 
 
 load = function

@@ -112,7 +112,7 @@ draw = function(items, loadout, title, selItemIdx = -1, toLeft=null)
 				if buying then btn.shortcutKeys += ["b", "B"]
 				btn.item = item
 				btn.action = function; takeFromContainer self.item; end function
-				if unitPrice <= agent.gold then buttons.push btn
+				if not buying or unitPrice <= agent.gold then buttons.push btn
 			end if
 		end if
 		if loadout != null then loadout.drawSlotIconForItem item, xUse, y
