@@ -29,7 +29,7 @@ draw = function(items, loadout, title, selItemIdx = -1, toLeft=null)
 	xUse = left + 24  // (center point)
 	xIcon = left + 38 // (left point)
 	xName = left + 56 // (left point)
-	xSize = left + width - 50  // (right point)
+	xSize = left + width - 56  // (right point)
 	xValue = left + width - 12 // (right point)
 
 	bottom = 320 - h/2
@@ -61,9 +61,9 @@ draw = function(items, loadout, title, selItemIdx = -1, toLeft=null)
 	
 	for i in items.indexes
 		item = items[i]
-		price = item.totalValue
-		if selling then price = container.getBuyPrice(item)
-		if buying then price = container.getSalePrice(item)
+		unitPrice = item.value
+		if selling then unitPrice = container.getBuyPrice(item)
+		if buying then unitPrice = container.getSalePrice(item)
 
 		if i == selItemIdx then
 			gfx.fillRect left+6, y-4, width-12, 18, "#4444AA"
@@ -96,13 +96,13 @@ draw = function(items, loadout, title, selItemIdx = -1, toLeft=null)
 				if buttons.len > 1 then buttons[1].x = left + width/2
 				label = "Put -->"
 				if selling then
-					if price <= 0 then label = "Give -->" else label = "Sell -->"
+					if unitPrice <= 0 then label = "Give -->" else label = "Sell -->"
 				end if
 				btn = Button.Make(label, left + width - 60, yButton, "pPtTmM".split(""))
 				if selling then btn.shortcutKeys += ["s", "S", "g", "G"]
 				btn.item = item
 				btn.action = function; putInContainer self.item; end function
-				if price != null then buttons.push btn
+				if unitPrice != null then buttons.push btn
 			else if toLeft == false then
 				label = "<-- Take"
 				if buying then
@@ -112,14 +112,22 @@ draw = function(items, loadout, title, selItemIdx = -1, toLeft=null)
 				if buying then btn.shortcutKeys += ["b", "B"]
 				btn.item = item
 				btn.action = function; takeFromContainer self.item; end function
-				if price <= agent.gold then buttons.push btn
+				if unitPrice <= agent.gold then buttons.push btn
 			end if
 		end if
 		if loadout != null then loadout.drawSlotIconForItem item, xUse, y
 		item.drawIcon gfx, xIcon, y - 2
-		boldFont.print item.nameWithQty, xName, y, 1, textColor
-		boldFont.printRight round(item.totalSize, 1), xSize, y, 1, textColor
-		boldFont.printRight price, xValue, y, 1, textColor
+		name = item.name
+		size = str(round(item.size, 1))
+		value = str(unitPrice)
+		if item.qty > 1 then
+			name += " (×" + item.qty + ")"
+			size += " (" + round(item.size * item.qty, 1) + ")"
+			if unitPrice then value += " (" + (unitPrice * item.qty) + ")"
+		end if
+		boldFont.print name, xName, y, 1, textColor
+		boldFont.printRight size, xSize, y, 1, textColor
+		boldFont.printRight value, xValue, y, 1, textColor
 		y -= rowHeight
 	end for
 	globals.gfx = disp.gfx
