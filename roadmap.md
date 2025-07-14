@@ -18,7 +18,7 @@ You Can...
 
 ## 0.3
 - ☐ See info about items on the map by mousing over them
-- ☐ Buy/sell items from NPCs
+- ☑︎ Buy/sell items from NPCs
 - ☐ Ask NPCs about arbitrary topics
 - ☑︎ Transfer between zones via doors/portals
 - ☐︎ Visit specialized shops in town: smith, alchemist, librarian, grocer

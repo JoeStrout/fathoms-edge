@@ -289,3 +289,10 @@ Started on buy/sell support.  This is triggered by opening an Agent as if they w
 ## July 13, 2025
 
 Buying and selling items is working pretty well now.  But there is one little design snag I've run into: whether to show unit size/price or total size/price for stacks of items.  I might end up using unit values in the buy/sell UI, but totals in the inventory screen; but in this case, I'll need to add appropriate headers at the top so you can tell.
+
+
+## July 14, 2025
+
+At a suggestion from Discord user @theonixie, I've changed the inventory (and buy/sell) display to include both unit size/value and total, with totals shown in parentheses.  This seems like a good solution.
+
+So the next step is to build some shops!
